@@ -6,7 +6,7 @@ install:
         - pip install -r requirements-dev.txt
 
 env:
-        - PYTHONPATH=/home/travis/build/ecabreja623/CS4513_demo_repo
+        - PYTHONPATH=/home/travis/build/ecabreja623/PutMeOn
 
 script:
         - make tests
