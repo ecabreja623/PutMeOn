@@ -2,8 +2,8 @@
 
 ## Requirements
 
+- Create a profile page that displays their music
 - Users can sync their Apple Music/Spotify music libraries
-- Users should have a profile page that displays their music
 - Allow users to search music from different countries
 - Music can be recommended based on images (machine learning)
 - Music can be recommended based on audio
