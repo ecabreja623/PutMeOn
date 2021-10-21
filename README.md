@@ -1,14 +1,12 @@
-# Chatbot Server
-
-# Class Demo
+# Put Me On
 
 ## Requirements
 
-- Allow user to enter chat room
-- Greet the user
-- Keep track of users
-- Answer user questions
-- Recognize user has left
+- Users can sync their Apple Music/Spotify music libraries
+- Users should have a profile page that displays their music
+- Allow users to search music from different countries
+- Music can be recommended based on images (machine learning)
+- Music can be recommended based on audio
 
 ## Design
 
@@ -18,3 +16,5 @@
 - Use Test-Driven-Development (TDD) to make sure we have testing
 - Use Swagger for initial interaction with server
 - Use Swagger, pydoc and good docstrings for documentation
+- Use Travis as the CI/CD pipeline
+- Use Heroku to deploy the app
