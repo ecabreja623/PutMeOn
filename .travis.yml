@@ -1,0 +1,15 @@
+language: python
+python:
+        - '3.8'
+
+install:
+        - pip install -r requirements-dev.txt
+
+env:
+        - PYTHONPATH=/home/travis/build/ecabreja623/CS4513_demo_repo
+
+script:
+        - make tests
+
+          ##after_success:
+        ##        - ./deloy.sh
