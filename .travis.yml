@@ -11,5 +11,9 @@ env:
 script:
         - make tests
 
-          ##after_success:
-        ##        - ./deloy.sh
+deploy:
+        - provider: heroku
+          api_key: $HEROKU_API_KEY
+          app: put-me-on
+          on:
+                  branch: master
