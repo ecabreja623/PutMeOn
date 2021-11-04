@@ -1,5 +1,38 @@
 {
-    "kyle": {"numFriends": 0, "friends": [], "numPlaylist": 0, "playlists": []},
-    "Thomas": {"numFriends": 0, "friends": [], "numPlaylist": 0, "playlists": []}, 
-    "Elvis": {"numFriends": 0, "friends": [], "numPlaylist": 0, "playlists": []}
+    "kyle": {
+        "numFriends": 0,
+        "friends": [],
+        "numPlaylist": 0,
+        "playlists": []
+    },
+    "Thomas": {
+        "numFriends": 0,
+        "friends": [],
+        "numPlaylist": 0,
+        "playlists": []
+    },
+    "Elvis": {
+        "numFriends": 0,
+        "friends": [],
+        "numPlaylist": 0,
+        "playlists": []
+    },
+    "User1": {
+        "numFriends": 0,
+        "friends": [],
+        "numPlaylists": 0,
+        "playlists": []
+    },
+    "User49533952": {
+        "numFriends": 0,
+        "friends": [],
+        "numPlaylists": 0,
+        "playlists": []
+    },
+    "User311646142": {
+        "numFriends": 0,
+        "friends": [],
+        "numPlaylists": 0,
+        "playlists": []
+    }
 }

@@ -7,9 +7,9 @@ Gradually, we will fill in actual calls to our datastore.
 import json
 import os
 
-HOME = os.environ["HOME"]
+PUTMEON_HOME = os.environ["PUTMEON_HOME"]
 
-USERS_DB = f"{HOME}/db/users.json"
+USERS_DB = f"{PUTMEON_HOME}/db/users.json"
 
 OK = 0
 NOT_FOUND = 1
@@ -23,7 +23,7 @@ def write_rooms(rooms):
 
 def get_users():
     """
-    A function to return all chat rooms.
+    A function to return all users.
     """
     try:
         with open(USERS_DB) as file:
@@ -35,9 +35,7 @@ def get_users():
 
 def add_user(username):
     """
-    Add a room to the room database.
-    Until we are using a real DB, we have a potential
-    race condition here.
+    Add a user to the user database.
     """
     users = get_users()
     if users is None:

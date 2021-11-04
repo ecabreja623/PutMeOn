@@ -42,6 +42,24 @@ class Endpoints(Resource):
         return {"Available endpoints": endpoints}
 
 
+@api.route('/list_users')
+class ListUsers(Resource):
+    """
+    THis endpoints returns a list of all the users
+    """
+    @api.response(HTTPStatus.OK, 'Success')
+    @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
+    def get(self):
+        """
+        Returns a list of all the users
+        """
+        users = db.get_users()
+        if users is None:
+            raise (wz.NotFound("Users db not found."))
+        else:
+            return users
+
+
 @api.route('/create_user/<username>')
 class CreateUser(Resource):
     """
@@ -53,7 +71,7 @@ class CreateUser(Resource):
         """
         This method adds a user to the database
         """
-        ret = db.add_room(username)
+        ret = db.add_user(username)
         if ret == db.NOT_FOUND:
             raise (wz.NotFound("User db not found."))
         elif ret == db.DUPLICATE:
