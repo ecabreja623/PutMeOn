@@ -37,5 +37,29 @@ class EndpointTestCase(TestCase):
         ret = cu.post(new_user)
         users = db.get_users()
         self.assertIn(new_user, users)
+    
+    def test_list_users1(self): 
+        '''
+        Post-condition 1: return is a dictionary
+        '''
+        lu = ep.ListUsers(Resource)
+        ret = lu.get()
+        self.assertIsInstance(ret, dict)
+    
+    def test_list_users2(self):
+        '''
+        Post-condition 2: keys ato the dict are strings 
+        '''
+        lu = ep.ListUsers(Resource)
+        ret = lu.get() 
+        for key in ret: 
+            self.assertIsInstance(key, str)
 
-
+    def test_list_users3(self): 
+        '''
+        Post-condition 3: the values in the dict are dicts themselves 
+        '''
+        lu = ep.ListUsers(Resource)
+        ret = lu.get()
+        for val in ret.values():
+            self.assertIsInstance(val, dict)
