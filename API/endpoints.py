@@ -8,10 +8,13 @@ from flask import Flask
 from flask_restx import Resource, Api
 import werkzeug.exceptions as wz
 
-import db.db as db
+import db.data as db
 
 app = Flask(__name__)
 api = Api(app)
+
+HELLO = 'Hola'
+WORLD = 'mundo'
 
 
 @api.route('/hello')
@@ -23,9 +26,9 @@ class HelloWorld(Resource):
     def get(self):
         """
         A trivial endpoint to see if the server is running.
-        It just answers with "hello world."
+        It just answers with "hola mundo".
         """
-        return {'Hola': 'mundo'}
+        return {HELLO: WORLD}
 
 
 @api.route('/endpoints')
@@ -67,6 +70,7 @@ class CreateUser(Resource):
     """
     @api.response(HTTPStatus.OK, 'Success')
     @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
+    @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
     def post(self, username):
         """
         This method adds a user to the database
@@ -76,3 +80,4 @@ class CreateUser(Resource):
             raise (wz.NotFound("User db not found."))
         elif ret == db.DUPLICATE:
             raise (wz.NotAcceptable("User already exists."))
+        return f"{username} added."

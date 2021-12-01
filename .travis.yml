@@ -9,7 +9,7 @@ env:
         - PYTHONPATH=/home/travis/build/ecabreja623/PutMeOn
 
 script:
-        - make tests
+        - make all_tests
 
 deploy:
         - provider: heroku

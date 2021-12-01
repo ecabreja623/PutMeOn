@@ -1,26 +1,19 @@
-LINTER = flake8
-API_DIR = API
-DB_DIR = db
-REQ_DIR = requirements
+include common.mk
 
-FORCE:
-
-prod: tests github
+prod: all_tests github
 
 github: FORCE
 	- git commit -a
 	git push origin master
 
-tests: lint unit
-
-unit: FORCE
-	cd $(API_DIR); nosetests --with-coverage --cover-package=API$*
-
-lint: FORCE
-	$(LINTER) $(API_DIR)/*.py
-
 dev_env: FORCE
+	- ./setup.sh PUTMEON_HOME
 	pip3 install -r $(REQ_DIR)/requirements-dev.txt
 
-docs: FORCE
+all_tests: FORCE
+	cd $(API_DIR); make tests
+	cd $(DB_DIR); make tests
+
+all_docs: FORCE
 	cd $(API_DIR); make docs
+	cd $(DB_DIR); make docs
