@@ -38,8 +38,7 @@ class EndpointTestCase(TestCase):
         ret = cu.post(new_user)
         users = db.get_users()
         self.assertIn(new_user, users)
-
-
+    
     def test_list_users1(self):
         """
         Post-condition 1: return is a dictionary.
