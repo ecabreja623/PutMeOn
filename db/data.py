@@ -114,4 +114,3 @@ def del_playlist(playlist_name):
         return OK
     else:
         return NOT_FOUND
-

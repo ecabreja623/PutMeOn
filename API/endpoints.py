@@ -45,6 +45,7 @@ class Endpoints(Resource):
 
 # USER METHODS
 
+
 @api.route('/users/list')
 class ListUsers(Resource):
     """
@@ -82,6 +83,7 @@ class CreateUser(Resource):
             raise (wz.NotAcceptable("User already exists."))
         return f"{username} added."
 
+
 @api.route('/users/search/<username>')
 class SearchUser(Resource):
     """
@@ -98,6 +100,7 @@ class SearchUser(Resource):
         if ret == db.NOT_FOUND:
             raise (wz.NotFound("User not found."))
         return ret
+
 
 @api.route('/users/delete/<username>')
 class DeleteUser(Resource):
@@ -119,6 +122,7 @@ class DeleteUser(Resource):
         return f"{username} deleted."
 
 # PLAYLIST METHODS
+
 
 @api.route('/playlists/list')
 class ListPlaylists(Resource):
@@ -157,6 +161,7 @@ class CreatePlaylist(Resource):
             raise (wz.NotAcceptable("Playlist already exists."))
         return f"{playlist_name} added."
 
+
 @api.route('/playlists/search/<playlist_name>')
 class SearchPlaylist(Resource):
     """
@@ -173,6 +178,7 @@ class SearchPlaylist(Resource):
         if ret == db.NOT_FOUND:
             raise (wz.NotFound("playlist not found."))
         return ret
+
 
 @api.route('/users/delete/<playlist_name>')
 class DeletePlaylist(Resource):
