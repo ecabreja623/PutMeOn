@@ -6,62 +6,112 @@ Gradually, we will fill in actual calls to our datastore.
 
 import json
 import os
+import db.db_connect as dbc
 
-PUTMEON_HOME = os.environ["PUTMEON_HOME"]
-TEST_MODE = os.environ.get("TEST_MODE", 0)
+PLAYLISTS = "playlists"
+USERS = "users"
 
-if TEST_MODE:
-    DB_DIR = f"{PUTMEON_HOME}/db/test_db"
-else:
-    DB_DIR = f"{PUTMEON_HOME}/db"
+PLNAME = "playlistName"
+USERNAME = "userName"
 
-USER_COLLECTION = f"{DB_DIR}/users.json"
+client = dbc.get_client()
+if client is None:
+    print("FAILED TO CONNECT TO MONGODB")
+    exit(1)
 
 OK = 0
 NOT_FOUND = 1
 DUPLICATE = 2
 
-
-def write_collection(perm_version, mem_version):
-    """
-    Write out the in-memory data collection in proper DB format.
-    """
-    with open(perm_version, 'w') as f:
-        json.dump(mem_version, f, indent=4)
-
-
-def read_collection(perm_version):
-    """
-    A function to read a collection off of disk.
-    """
-    try:
-        with open(perm_version) as file:
-            return json.loads(file.read())
-    except FileNotFoundError:
-        print(f"{perm_version} not found.")
-        return None
-
-
 def get_users():
     """
-    A function to return all users.
+    returns all users
     """
-    return read_collection(USER_COLLECTION)
+    return dbc.fetch_all(USERS, USERNAME)
 
+def get_playlists():
+    """
+    returns all playlists
+    """
+    return dbc.fetch_all(PLAYLISTS, PLNAME)
+
+def user_exists(username):
+    """
+    return true/false whether or not user exists
+    """
+    rec = dbc.fetch_one(USERS, filters = {USERNAME : username})
+    return rec is not None
+
+def playlist_exists(playlist_name):
+    """
+    return true/false whether or not playlist exists
+    """
+    rec = dbc.fetch_one(PLAYLISTS, filters = {PLNAME : playlist_name})
+    return rec is not None
+
+def get_user(username):
+    """
+    return a user given a username, else NOT_FOUND
+    """
+    if user_exists(username):
+        return dbc.fetch_one(USERS, filters = {USERNAME : username})
+    else:
+        return NOT_FOUND
+
+def get_playlist(playlist_name):
+    """
+    returns a playlist given its name, else NOT_FOUND
+    """
+    if playlist_exists(playlist_name):
+        return dbc.fetch_one(PLAYLISTS, filters = {PLNAME: playlist_name})
+    else:
+        return NOT_FOUND
 
 def add_user(username):
     """
-    Add a user to the user database.
+    adds a user, returns whether successful or not
     """
-    users = get_users()
-    if users is None:
-        return NOT_FOUND
-    elif username in users:
+    if user_exists(username):
         return DUPLICATE
     else:
-        users[username] = {"numFriends": 0,
-                           "friends": [],
-                           "numPlaylists": 0,
-                           "playlists": []}
-        write_collection(USER_COLLECTION, users)
+        dbc.insert_doc(USERS, {USERNAME: username,
+        "numFriends": 0,
+        "friends": [],
+        "numPlaylists": 0,
+        "playlists": []
+        })
         return OK
+
+def add_playlist(playlist_name):
+    """
+    creates a playlist, returns whether successful or not
+    """
+    if playlist_exists(playlist_name):
+        return DUPLICATE
+    else:
+        dbc.insert_doc(PLAYLISTS, {PLNAME: playlist_name,
+        "likes": 0,
+        "songs": []
+        })
+        return OK
+
+def del_user(username):
+    """
+    delete a user by username
+    """
+    if user_exists(username):
+        dbc.del_one(USERS, filters={USERNAME: username})
+        return OK
+    else:
+        return NOT_FOUND
+
+def del_playlist(playlist_name):
+    """
+    delete a playlist by playlist name
+    """
+    if playlist_exists(playlist_name):
+        dbc.del_one(PLAYLISTS, filters={PLNAME: playlist_name})
+        return OK
+    else:
+        return NOT_FOUND
+
