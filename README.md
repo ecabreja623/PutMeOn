@@ -4,7 +4,7 @@
 
 - Create a profile page that displays their data
 - Search for other users/friends 
-- Create and delete playlists
+- Create, delete, and update playlists
 
 ## Design
 
@@ -27,7 +27,8 @@
 - Users can create playlists using the '/create_playlist' 
     - users must pass playlist name 
     - user must already exist
-- Users can delete their playlist using the 'delete_playlist' endpint 
+- Users can delete their playlist using the 'delete_playlist' endpoint 
+- Users can update their playlist using the 'update_playlist' endpoint
 - Users can search for their friend using the 'search' endpoint 
     - user must pass their friend's username 
 
