@@ -5,6 +5,9 @@
 - Create a profile page that displays their data
 - Search for other users/friends 
 - Create, delete, and update playlists
+- Create, delete, and update users 
+- List users 
+- List playlists 
 
 ## Design
 
@@ -17,13 +20,9 @@
 - Use Travis as the CI/CD pipeline
 - Use Heroku to deploy the app
 
-- Users can create a profile page using the '/create_page' endpoint
+- Users can create a user using the '/create_user' endpoint
     - users must pass a unique username 
-    - this will add to the database a dictionary containing initial information about a user
-        - number of friends 
-        - list of friends 
-        - number of playlists 
-        - list of playlists 
+- Users can delete a user using the '/delete_user' endpoint
 - Users can create playlists using the '/create_playlist' 
     - users must pass playlist name 
     - user must already exist
