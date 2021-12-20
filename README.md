@@ -5,9 +5,9 @@
 - Create a profile page that displays their data
 - Search for other users/friends 
 - Create, delete, and update playlists
-- Create, delete, and update users 
+- List playlists
+- Create and delete users 
 - List users 
-- List playlists 
 
 ## Design
 
