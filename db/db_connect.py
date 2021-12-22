@@ -1,7 +1,7 @@
 import os
 import json
 import pymongo as pm
-from pymongo.server_api import ServerApi
+# from pymongo.server_api import ServerApi
 import bson.json_util as bsutil
 
 USER_NM = os.environ.get("MONGO_UN", 'user')
@@ -32,8 +32,8 @@ def get_client():
         print("connecting to local mongo")
         client = pm.MongoClient()
     else:
-         print("connecting to remote mongo")
-         client = pm.MongoClient(CONN_STR) #, server_api=ServerApi('1'))
+        print("connecting to remote mongo")
+        client = pm.MongoClient(CONN_STR)  # , server_api=ServerApi('1'))
     return client
 
 
