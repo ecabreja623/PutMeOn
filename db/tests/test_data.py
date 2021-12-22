@@ -5,6 +5,7 @@ This file holds the tests for data.py
 from unittest import TestCase, skip
 
 import data as db
+from db.data import USERNAME
 
 FAKE_USER = "Fake user"
 
@@ -13,23 +14,19 @@ class DBTestCase(TestCase):
     def setUp(self):
         pass
 
+
     def tearDown(self):
         pass
 
-    def test_write_collection(self):
+
+    def test_add_user(self):
         """
-        Can we write the user db?
+        Can we write to the user db?
         """
-        fake_data = {FAKE_USER: {
-            "numFriends" : 0,
-            "friends" : [],
-            "numPlaylists" : 0,
-            "playlists" : []
-            }
-        }
-        db.write_collection(db.USER_COLLECTION, fake_data)
-        users = db.get_users()
-        self.assertIn(FAKE_USER, users)
+        db.add_user(FAKE_USER)
+        user = db.get_user(FAKE_USER)
+        self.assertEqual(user[USERNAME],FAKE_USER)
+
 
     def test_get_users(self):
         """
@@ -37,3 +34,12 @@ class DBTestCase(TestCase):
         """
         users = db.get_users()
         self.assertIsInstance(users, dict)
+
+
+    def test_get_user(self):
+        """
+        Can we fetch a user from the user db?
+        """
+        db.add_user(FAKE_USER)
+        user = db.get_user(FAKE_USER)
+        self.assertIsInstance(user, dict)

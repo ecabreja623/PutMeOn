@@ -4,8 +4,8 @@ At first, it will just contain stubs that return fake data.
 Gradually, we will fill in actual calls to our datastore.
 """
 
-import json
-import os
+# import json
+# import os
 import db.db_connect as dbc
 
 PLAYLISTS = "playlists"
@@ -23,11 +23,13 @@ OK = 0
 NOT_FOUND = 1
 DUPLICATE = 2
 
+
 def get_users():
     """
     returns all users
     """
     return dbc.fetch_all(USERS, USERNAME)
+
 
 def get_playlists():
     """
@@ -35,37 +37,42 @@ def get_playlists():
     """
     return dbc.fetch_all(PLAYLISTS, PLNAME)
 
+
 def user_exists(username):
     """
     return true/false whether or not user exists
     """
-    rec = dbc.fetch_one(USERS, filters = {USERNAME : username})
+    rec = dbc.fetch_one(USERS, filters={USERNAME: username})
     return rec is not None
+
 
 def playlist_exists(playlist_name):
     """
     return true/false whether or not playlist exists
     """
-    rec = dbc.fetch_one(PLAYLISTS, filters = {PLNAME : playlist_name})
+    rec = dbc.fetch_one(PLAYLISTS, filters={PLNAME: playlist_name})
     return rec is not None
+
 
 def get_user(username):
     """
     return a user given a username, else NOT_FOUND
     """
     if user_exists(username):
-        return dbc.fetch_one(USERS, filters = {USERNAME : username})
+        return dbc.fetch_one(USERS, filters={USERNAME: username})
     else:
         return NOT_FOUND
+
 
 def get_playlist(playlist_name):
     """
     returns a playlist given its name, else NOT_FOUND
     """
     if playlist_exists(playlist_name):
-        return dbc.fetch_one(PLAYLISTS, filters = {PLNAME: playlist_name})
+        return dbc.fetch_one(PLAYLISTS, filters={PLNAME: playlist_name})
     else:
         return NOT_FOUND
+
 
 def add_user(username):
     """
@@ -75,12 +82,13 @@ def add_user(username):
         return DUPLICATE
     else:
         dbc.insert_doc(USERS, {USERNAME: username,
-        "numFriends": 0,
-        "friends": [],
-        "numPlaylists": 0,
-        "playlists": []
-        })
+                               "numFriends": 0,
+                               "friends": [],
+                               "numPlaylists": 0,
+                               "playlists": []
+                               })
         return OK
+
 
 def add_playlist(playlist_name):
     """
@@ -90,10 +98,11 @@ def add_playlist(playlist_name):
         return DUPLICATE
     else:
         dbc.insert_doc(PLAYLISTS, {PLNAME: playlist_name,
-        "likes": 0,
-        "songs": []
-        })
+                                   "likes": 0,
+                                   "songs": []
+                                   })
         return OK
+
 
 def del_user(username):
     """
@@ -104,6 +113,7 @@ def del_user(username):
         return OK
     else:
         return NOT_FOUND
+
 
 def del_playlist(playlist_name):
     """
