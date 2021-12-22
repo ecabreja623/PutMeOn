@@ -154,7 +154,7 @@ class CreatePlaylist(Resource):
         """
         This method adds a playlist to the database
         """
-        ret = db.add_user(playlist_name)
+        ret = db.add_playlist(playlist_name)
         if ret == db.NOT_FOUND:
             raise (wz.NotFound("Playlist db not found."))
         elif ret == db.DUPLICATE:

@@ -41,7 +41,8 @@ def fetch_one(collect_nm, filters={}):
     """
     Fetch one record that meets filters.
     """
-    return client[DB_NM][collect_nm].find_one(filters)
+    doc = client[DB_NM][collect_nm].find_one(filters)
+    return json.loads(bsutil.dumps(doc))
 
 
 def del_one(collect_nm, filters={}):
