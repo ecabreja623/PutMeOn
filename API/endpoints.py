@@ -154,7 +154,7 @@ class CreatePlaylist(Resource):
         """
         This method adds a playlist to the database
         """
-        ret = db.add_user(playlist_name)
+        ret = db.add_playlist(playlist_name)
         if ret == db.NOT_FOUND:
             raise (wz.NotFound("Playlist db not found."))
         elif ret == db.DUPLICATE:
@@ -180,17 +180,17 @@ class SearchPlaylist(Resource):
         return ret
 
 
-@api.route('/users/delete/<playlist_name>')
+@api.route('/playlists/delete/<playlist_name>')
 class DeletePlaylist(Resource):
     """
-    This class supports deleting a user from the database.
+    This class supports deleting a playlist from the database.
     """
     @api.response(HTTPStatus.OK, 'Success')
     @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
     @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
     def post(self, playlist_name):
         """
-        This method adds a user to the database
+        This method deletes a playlist from the database
         """
         ret = db.del_playlist(playlist_name)
         if ret == db.NOT_FOUND:

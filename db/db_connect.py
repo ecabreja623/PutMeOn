@@ -1,18 +1,21 @@
 import os
 import json
 import pymongo as pm
-# from pymongo.server_api import ServerApi
+from pymongo.server_api import ServerApi
 import bson.json_util as bsutil
 
-# USER_NM = os.environ.get("MONGO_UN", '')
-# CLOUD_SVC = "serverlessinstance0.irvgp.mongodb.net"
-# PSSWD = os.environ.get("MONGO_PSSWD", '')
-# CLOUD_MDB = "mongodb+srv"
-# DB_PARAMS = "retryWrites=true&w=majority"
+USER_NM = os.environ.get("MONGO_UN", 'user')
+CLOUD_SVC = "cluster0.c45bk.mongodb.net"
+PASSWD = os.environ.get("MONGO_PSSWD", 'putmeon')
+CLOUD_MDB = "mongodb+srv"
+DB_PARAMS = "retryWrites=true&w=majority"
 
 DB_NM = "putmeonDB"
 if os.environ.get("TEST_MODE", ''):
     DB_NM = "putmeonDB_test"
+
+CONN_STR = f"{CLOUD_MDB}://{USER_NM}:{PASSWD}@{CLOUD_SVC}/{DB_NM}?{DB_PARAMS}"
+print(CONN_STR)
 
 REMOTE = '1'
 LOCAL = '0'
@@ -28,12 +31,9 @@ def get_client():
     if os.environ.get("LOCAL_MONGO", REMOTE) == LOCAL:
         print("connecting to local mongo")
         client = pm.MongoClient()
-    # else:
-    #     print("connecting to remote mongo")
-    #     client = pm.MongoClient(f"{CLOUD_MDB}://{USER_NM}:{PASSWD}@"
-    #                             + f"{CLOUD_SVC}/{DB_NM}?"
-    #                             + f"{DB_PARAMS}",
-    #                             server_api=ServerApi('1'))
+    else:
+         print("connecting to remote mongo")
+         client = pm.MongoClient(CONN_STR) #, server_api=ServerApi('1'))
     return client
 
 
