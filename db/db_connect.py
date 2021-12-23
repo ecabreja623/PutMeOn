@@ -46,9 +46,16 @@ def fetch_one(collect_nm, filters={}):
 
 def del_one(collect_nm, filters={}):
     """
-    Fetch one record that meets filters.
+    delete one record that meets filters.
     """
     return client[DB_NM][collect_nm].delete_one(filters)
+
+
+def del_many(collect_nm, filters={}):
+    """
+    delete all records for some filter
+    """
+    return client[DB_NM][collect_nm].delete_many(filters)
 
 
 def fetch_all(collect_nm, key_nm):

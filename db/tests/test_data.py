@@ -12,12 +12,10 @@ FAKE_PLAYLIST = "Fake playlist"
 
 class DBTestCase(TestCase):
     def setUp(self):
-        pass
-
+        db.empty()
 
     def tearDown(self):
         pass
-
 
     def test_add_user(self):
         """
