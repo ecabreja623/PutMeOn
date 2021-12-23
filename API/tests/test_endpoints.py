@@ -30,28 +30,13 @@ class EndpointTestCase(TestCase):
         self.assertIsInstance(ret, dict)
         self.assertIn(ep.HELLO, ret)
 
-    def test_create_user1(self):
-        """
-        Post-condition 1: create user and check if in db
-        """
-        cu = ep.CreateUser(Resource)
-        new_user = new_entity_name("user")
-        ret = cu.post(new_user)
-        users = db.get_users()
-        self.assertIn(new_user, users)
-    
-    def test_create_user2(self):
-        """
-        Post-condition 2: create duplicates and make sure only one appears
-        """
-        cu = ep.CreateUser(Resource)
-        new_user = new_entity_name("user")
-        cu.post(new_user)
-        try:
-            cu.post(new_user)
-            self.assertFalse(True)
-        except wz.NotAcceptable:
-            self.assertFalse(False)
+    def test_endpoints(self):
+        endp = ep.Endpoints(Resource)
+        ret = endp.get()
+        self.assertIn("Available endpoints", ret)
+        self.assertIsInstance(ret["Available endpoints"], list)
+
+    #USER TESTS
 
     def test_list_users1(self):
         """
@@ -78,6 +63,51 @@ class EndpointTestCase(TestCase):
         ret = lu.get()
         for val in ret.values():
             self.assertIsInstance(val, dict)
+
+    def test_create_user1(self):
+        """
+        Post-condition 1: create user and check if in db
+        """
+        cu = ep.CreateUser(Resource)
+        new_user = new_entity_name("user")
+        ret = cu.post(new_user)
+        users = db.get_users()
+        self.assertIn(new_user, users)
+    
+    def test_create_user2(self):
+        """
+        Post-condition 2: create duplicates and make sure only one appears
+        """
+        cu = ep.CreateUser(Resource)
+        new_user = new_entity_name("user")
+        cu.post(new_user)
+        try:
+            cu.post(new_user)
+            self.assertFalse(True)
+        except wz.NotAcceptable:
+            self.assertFalse(False)
+
+    def test_search_user1(self):
+        """
+        Post-condition 1: successfully search for a user that exists
+        """
+        newuser = new_entity_name("user")
+        db.add_user(newuser)
+        su = ep.SearchUser(Resource)
+        ret = su.get(newuser)
+        self.assertEqual(newuser, ret[db.USERNAME])
+
+    def test_search_user2(self):
+        """
+        Post-condition 2: searching for a user that does not exist returns an error
+        """    
+        newuser = new_entity_name("user")
+        su = ep.SearchUser(Resource)
+        try:
+            ret = su.get(newuser)
+            self.assertFalse(True)
+        except wz.NotFound:
+            self.assertFalse(False)
 
     def test_delete_user1(self):
         """
@@ -148,6 +178,19 @@ class EndpointTestCase(TestCase):
         except wz.NotAcceptable:
             self.assertFalse(False)
 
+    def test_add_friends4(self):
+        """
+        Post-condition 4: A user cannot add themself as a friend
+        """
+        newuser = new_entity_name("user")
+        db.add_user(newuser)
+        af = ep.BefriendUser(Resource)
+        try:
+            af.post(newuser, newuser)
+            self.assertFalse(True)
+        except wz.NotAcceptable:
+            self.assertFalse(False)
+
     def test_remove_friends1(self):
         """
         Post-condition 1: two friends can remove one another
@@ -198,76 +241,6 @@ class EndpointTestCase(TestCase):
         except wz.NotFound:
             self.assertFalse(False)
 
-    def test_add_song1(self):
-        """
-        Post-condition1: we can add a new song to a new playlist
-        """
-        ap = ep.AddToPlaylist(Resource)
-        newsong = new_entity_name("song")
-        newplaylist = new_entity_name("playlist")
-        db.add_playlist(newplaylist)
-        ap.post(newplaylist, newsong)
-        pl = db.get_playlist(newplaylist)
-        self.assertIn(newsong, pl["songs"])
-
-    def test_add_song2(self):
-        """
-        Post-condition 2: we cannot add the same song to a playlist twice
-        """
-        ap = ep.AddToPlaylist(Resource)
-        newsong = new_entity_name("song")
-        newplaylist = new_entity_name("playlist")
-        db.add_playlist(newplaylist)
-        ap.post(newplaylist, newsong)
-        try:
-            ap.post(newplaylist, newsong)
-            self.assertFalse(True)
-        except wz.NotAcceptable:
-            self.assertFalse(False)
-
-    def test_remove_song1(self):
-        """
-        Post-condition 1: we can remove a song from a playlist given that it is present
-        """
-        newpl = new_entity_name("playlist")
-        db.add_playlist(newpl)
-        newsong = new_entity_name("song")
-        db.update_playlist(newpl, {"$push": {"songs": newsong}})
-        pl = db.get_playlist(newpl)
-        self.assertIn(newsong, pl['songs'])
-        rs = ep.RemoveFromPlaylist(Resource)
-        rs.post(newpl, newsong)
-        pl = db.get_playlist(newpl)
-        self.assertNotIn(newsong, pl['songs'])
-
-    def test_remove_song2(self):
-        """
-        Post-condition 2: Removing a song when it is not present results in an error
-        """
-        newpl = new_entity_name("playlist")
-        db.add_playlist(newpl)
-        newsong = new_entity_name("song")
-        rs = ep.RemoveFromPlaylist(Resource)
-        try:
-            rs.post(newpl, newsong)
-            self.assertFalse(True)
-        except wz.NotFound:
-            self.assertFalse(False)
-
-
-    def test_remove_song3(self):
-        """
-        Post-condition 3: Removing a song from a playlist that doesn't exist results in an error
-        """
-        newpl = new_entity_name("playlist")
-        newsong = new_entity_name("song")
-        rs = ep.RemoveFromPlaylist(Resource)
-        try:
-            rs.post(newpl, newsong)
-            self.assertFalse(True)
-        except wz.NotFound:
-            self.assertFalse(False)
-
     def test_like_playlist1(self):
         """
         Post-condition1: we can like a playlist from a new user, and have the change reflected in both objects
@@ -298,7 +271,6 @@ class EndpointTestCase(TestCase):
             self.assertFalse(True)
         except wz.NotAcceptable:
             self.assertFalse(False)
-        
 
     def test_like_playlist3(self):
         """
@@ -388,6 +360,171 @@ class EndpointTestCase(TestCase):
         try:
             lp.post(newuser, newpl)
             up.post(newuser, newpl)
+            self.assertFalse(True)
+        except wz.NotFound:
+            self.assertFalse(False)
+
+    #PLAYLIST TESTS
+
+    def test_list_playlists1(self):
+        """
+        Post-condition 1: return is a dictionary.
+        """
+        lp = ep.ListPlaylists(Resource)
+        ret = lp.get()
+        self.assertIsInstance(ret, dict)
+
+    def test_list_playlists2(self):
+        """
+        Post-condition 2: keys to the dict are strings
+        """
+        lp = ep.ListPlaylists(Resource)
+        ret = lp.get()
+        for key in ret:
+            self.assertIsInstance(key, str)
+
+    def test_list_playlists3(self):
+        """
+        Post-condition 3: the values in the dict are themselves dicts
+        """
+        lp = ep.ListPlaylists(Resource)
+        ret = lp.get()
+        for val in ret.values():
+            self.assertIsInstance(val, dict)
+
+    def test_create_playlist1(self):
+        """
+        Post-condition 1: create playlist and check if in db
+        """
+        cu = ep.CreatePlaylist(Resource)
+        new_playlist = new_entity_name("playlist")
+        ret = cu.post(new_playlist)
+        playlists = db.get_playlists()
+        self.assertIn(new_playlist, playlists)
+    
+    def test_create_playlist2(self):
+        """
+        Post-condition 2: create duplicates and make sure only one appears
+        """
+        cu = ep.CreatePlaylist(Resource)
+        new_playlist = new_entity_name("playlist")
+        cu.post(new_playlist)
+        try:
+            cu.post(new_playlist)
+            self.assertFalse(True)
+        except wz.NotAcceptable:
+            self.assertFalse(False)
+
+    def test_search_playlist1(self):
+        """
+        Post-condition 1: successfully search for a playlist that exists
+        """
+        newplaylist = new_entity_name("playlist")
+        db.add_playlist(newplaylist)
+        su = ep.SearchPlaylist(Resource)
+        ret = su.get(newplaylist)
+        self.assertEqual(newplaylist, ret[db.PLNAME])
+
+    def test_search_playlist2(self):
+        """
+        Post-condition 2: searching for a playlist that does not exist returns an error
+        """    
+        newplaylist = new_entity_name("playlist")
+        su = ep.SearchPlaylist(Resource)
+        try:
+            ret = su.get(newplaylist)
+            self.assertFalse(True)
+        except wz.NotFound:
+            self.assertFalse(False)
+
+    def test_delete_playlist1(self):
+        """
+        Post-condition 1: we can create and delete a playlist
+        """
+        new_playlist = new_entity_name("playlist")
+        db.add_playlist(new_playlist)
+        du = ep.DeletePlaylist(Resource)
+        du.post(new_playlist)
+        self.assertNotIn(new_playlist, db.get_playlists())
+
+    def test_delete_playlist2(self):
+        """
+        Post-condition 2: deleting a playlist that does not exist results in a wz.NotAcceptable error
+        """
+        new_playlist = new_entity_name("playlist")
+        du = ep.DeletePlaylist(Resource)
+        try:
+            du.post(new_playlist)
+            self.assertFalse(True)
+        except wz.NotFound:
+            self.assertFalse(False)
+
+
+    def test_add_song1(self):
+        """
+        Post-condition1: we can add a new song to a new playlist
+        """
+        ap = ep.AddToPlaylist(Resource)
+        newsong = new_entity_name("song")
+        newplaylist = new_entity_name("playlist")
+        db.add_playlist(newplaylist)
+        ap.post(newplaylist, newsong)
+        pl = db.get_playlist(newplaylist)
+        self.assertIn(newsong, pl["songs"])
+
+    def test_add_song2(self):
+        """
+        Post-condition 2: we cannot add the same song to a playlist twice
+        """
+        ap = ep.AddToPlaylist(Resource)
+        newsong = new_entity_name("song")
+        newplaylist = new_entity_name("playlist")
+        db.add_playlist(newplaylist)
+        ap.post(newplaylist, newsong)
+        try:
+            ap.post(newplaylist, newsong)
+            self.assertFalse(True)
+        except wz.NotAcceptable:
+            self.assertFalse(False)
+
+    def test_remove_song1(self):
+        """
+        Post-condition 1: we can remove a song from a playlist given that it is present
+        """
+        newpl = new_entity_name("playlist")
+        db.add_playlist(newpl)
+        newsong = new_entity_name("song")
+        db.update_playlist(newpl, {"$push": {"songs": newsong}})
+        pl = db.get_playlist(newpl)
+        self.assertIn(newsong, pl['songs'])
+        rs = ep.RemoveFromPlaylist(Resource)
+        rs.post(newpl, newsong)
+        pl = db.get_playlist(newpl)
+        self.assertNotIn(newsong, pl['songs'])
+
+    def test_remove_song2(self):
+        """
+        Post-condition 2: Removing a song when it is not present results in an error
+        """
+        newpl = new_entity_name("playlist")
+        db.add_playlist(newpl)
+        newsong = new_entity_name("song")
+        rs = ep.RemoveFromPlaylist(Resource)
+        try:
+            rs.post(newpl, newsong)
+            self.assertFalse(True)
+        except wz.NotFound:
+            self.assertFalse(False)
+
+    def test_remove_song3(self):
+        """
+        Post-condition 3: Removing a song from a playlist that doesn't exist results in an error
+        """
+        newpl = new_entity_name("playlist")
+        newsong = new_entity_name("song")
+        rs = ep.RemoveFromPlaylist(Resource)
+        try:
+            rs.post(newpl, newsong)
             self.assertFalse(True)
         except wz.NotFound:
             self.assertFalse(False)

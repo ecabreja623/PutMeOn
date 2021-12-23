@@ -27,14 +27,12 @@ class DBTestCase(TestCase):
         user = db.get_user(FAKE_USER)
         self.assertEqual(user[USERNAME],FAKE_USER)
 
-
     def test_get_users(self):
         """
         Can we fetch user db?
         """
         users = db.get_users()
         self.assertIsInstance(users, dict)
-
 
     def test_get_user(self):
         """
@@ -53,7 +51,6 @@ class DBTestCase(TestCase):
         self.assertEqual(ret, db.OK)
         self.assertFalse(FAKE_USER in db.get_users())
 
-
     def test_add_user(self):
         """
         Can we write to the user db?
@@ -61,6 +58,14 @@ class DBTestCase(TestCase):
         db.add_user(FAKE_USER)
         user = db.get_user(FAKE_USER)
         self.assertEqual(user[USERNAME],FAKE_USER)
+    
+    def test_user_exists(self):
+        """
+        Post-condition 1: returns true when a user exists, false otherwise
+        """
+        db.add_user(FAKE_USER)
+        self.assertTrue(db.user_exists(FAKE_USER))
+        self.assertFalse(db.user_exists("FOOBAR JONES"))
 
     def test_update_user(self):
         """
@@ -84,7 +89,6 @@ class DBTestCase(TestCase):
         playlists = db.get_playlists()
         self.assertIsInstance(playlists, dict)
 
-
     def test_get_playlist(self):
         """
         Can we fetch a playlist from the playlist db?
@@ -93,6 +97,14 @@ class DBTestCase(TestCase):
         playlist = db.get_playlist(FAKE_PLAYLIST)
         self.assertIsInstance(playlist, dict)
 
+    def test_add_playlist(self):
+        """
+        Can we write to the playlist db?
+        """
+        db.add_playlist(FAKE_PLAYLIST)
+        playlist = db.get_playlist(FAKE_PLAYLIST)
+        self.assertEqual(playlist[db.PLNAME], FAKE_PLAYLIST)
+    
     def test_delete_playlist(self):
         """
         Can we delete a playlist from the playlist db?
@@ -101,6 +113,15 @@ class DBTestCase(TestCase):
         ret = db.del_playlist(FAKE_PLAYLIST)
         self.assertEqual(ret, db.OK)
         self.assertNotIn(FAKE_PLAYLIST, db.get_playlists())
+
+    def test_playlist_exists(self):
+        """
+        Post-condition 1: returns true when a playlist exists, false otherwise
+        """
+        db.add_playlist(FAKE_PLAYLIST)
+        self.assertTrue(db.playlist_exists(FAKE_PLAYLIST))
+        self.assertFalse(db.playlist_exists("FOO TRACKS TO BAR TO"))
+
 
     def test_update_playlist(self):
         """

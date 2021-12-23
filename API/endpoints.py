@@ -58,10 +58,7 @@ class ListUsers(Resource):
         Returns a list of all the users
         """
         users = db.get_users()
-        if users is None:
-            raise (wz.NotFound("Users db not found."))
-        else:
-            return users
+        return users
 
 
 @api.route('/users/create/<username>')
@@ -77,9 +74,7 @@ class CreateUser(Resource):
         This method adds a user to the database
         """
         ret = db.add_user(username)
-        if ret == db.NOT_FOUND:
-            raise (wz.NotFound("User db not found."))
-        elif ret == db.DUPLICATE:
+        if ret == db.DUPLICATE:
             raise (wz.NotAcceptable("User already exists."))
         return f"{username} added."
 
@@ -168,20 +163,17 @@ class UnfriendUser(Resource):
         """
         This method removes two users from each others friend lists
         """
-        if usern1 != usern2:
-            user1, user2 = db.get_user(usern1), db.get_user(usern2)
-            if user1 == db.NOT_FOUND or user2 == db.NOT_FOUND:
-                raise(wz.NotFound("At least one user not found"))
-            elif usern1 in user2["friends"] or usern2 in user1["friends"]:
-                db.update_user(usern2, {"$pull": {"friends": usern1}})
-                db.update_user(usern1, {"$pull": {"friends": usern2}})
-                db.update_user(usern2, {"$inc": {"numFriends": -1}})
-                db.update_user(usern1, {"$inc": {"numFriends": -1}})
-                return "Users removed eachother as friends"
-            else:
-                raise(wz.NotAcceptable("Users are not friends"))
+        user1, user2 = db.get_user(usern1), db.get_user(usern2)
+        if user1 == db.NOT_FOUND or user2 == db.NOT_FOUND:
+            raise(wz.NotFound("At least one user not found"))
+        elif usern1 in user2["friends"] or usern2 in user1["friends"]:
+            db.update_user(usern2, {"$pull": {"friends": usern1}})
+            db.update_user(usern1, {"$pull": {"friends": usern2}})
+            db.update_user(usern2, {"$inc": {"numFriends": -1}})
+            db.update_user(usern1, {"$inc": {"numFriends": -1}})
+            return "Users removed eachother as friends"
         else:
-            raise(wz.NotAcceptable("User cannot add themself as a friend"))
+            raise(wz.NotAcceptable("Users are not friends"))
 
 
 @api.route('/users/<username>/like_playlist/<playlist_name>')
