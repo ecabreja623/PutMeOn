@@ -104,6 +104,26 @@ def add_playlist(playlist_name):
         return OK
 
 
+def update_user(user_name, update):
+    """
+    update an existing user given new data
+    """
+    if not user_exists(user_name):
+        return NOT_FOUND
+    else:
+        dbc.update_doc(USERS, {USERNAME: user_name}, update)
+
+
+def update_playlist(playlist_name, update):
+    """
+    update a playlist given a change
+    """
+    if not playlist_exists(playlist_name):
+        return NOT_FOUND
+    else:
+        dbc.update_doc(PLAYLISTS, {PLNAME: playlist_name}, update)
+
+
 def del_user(username):
     """
     delete a user by username

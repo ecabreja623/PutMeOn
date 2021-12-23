@@ -114,12 +114,126 @@ class DeleteUser(Resource):
         """
         This method deletes a user from the database
         """
-        ret = db.del_user(username)
+        ret = db.get_user(username)
         if ret == db.NOT_FOUND:
             raise (wz.NotFound("User db not found."))
-        elif ret == db.DUPLICATE:
-            raise (wz.NotAcceptable("User already exists."))
+        else:
+            unliker = UnlikePlaylist(Resource)
+            for pl in ret["playlists"]:
+                unliker.post(username, pl)
+            unfriender = UnfriendUser(Resource)
+            for friend in ret['friends']:
+                unfriender.post(username, friend)
+            db.del_user(username)
         return f"{username} deleted."
+
+
+@api.route('/users/<usern1>/add_friend/<usern2>')
+class BefriendUser(Resource):
+    """
+    This class supports two users adding each other as friends
+    """
+    @api.response(HTTPStatus.OK, 'Success')
+    @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
+    @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
+    def post(self, usern1, usern2):
+        """
+        This method adds two users to each others friend lists
+        """
+        if usern1 != usern2:
+            user1, user2 = db.get_user(usern1), db.get_user(usern2)
+            if user1 == db.NOT_FOUND or user2 == db.NOT_FOUND:
+                raise(wz.NotFound("At least one user not found"))
+            elif usern1 in user2["friends"] or usern2 in user1["friends"]:
+                raise(wz.NotAcceptable("Users are already friends"))
+            else:
+                db.update_user(usern2, {"$push": {"friends": usern1}})
+                db.update_user(usern1, {"$push": {"friends": usern2}})
+                db.update_user(usern2, {"$inc": {"numFriends": 1}})
+                db.update_user(usern1, {"$inc": {"numFriends": 1}})
+                return "Users added eachother as friends"
+        else:
+            raise(wz.NotAcceptable("User cannot add themself as a friend"))
+
+
+@api.route('/users/<usern1>/remove_friend/<usern2>')
+class UnfriendUser(Resource):
+    """
+    This class supports two users removing one another from their friends
+    """
+    @api.response(HTTPStatus.OK, 'Success')
+    @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
+    @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
+    def post(self, usern1, usern2):
+        """
+        This method removes two users from each others friend lists
+        """
+        if usern1 != usern2:
+            user1, user2 = db.get_user(usern1), db.get_user(usern2)
+            if user1 == db.NOT_FOUND or user2 == db.NOT_FOUND:
+                raise(wz.NotFound("At least one user not found"))
+            elif usern1 in user2["friends"] or usern2 in user1["friends"]:
+                db.update_user(usern2, {"$pull": {"friends": usern1}})
+                db.update_user(usern1, {"$pull": {"friends": usern2}})
+                db.update_user(usern2, {"$inc": {"numFriends": -1}})
+                db.update_user(usern1, {"$inc": {"numFriends": -1}})
+                return "Users removed eachother as friends"
+            else:
+                raise(wz.NotAcceptable("Users are not friends"))
+        else:
+            raise(wz.NotAcceptable("User cannot add themself as a friend"))
+
+
+@api.route('/users/<username>/like_playlist/<playlist_name>')
+class LikePlaylist(Resource):
+    """
+    This class supports a user liking a playlist
+    """
+    @api.response(HTTPStatus.OK, 'Success')
+    @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
+    @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
+    def post(self, username, playlist_name):
+        """
+        This method supports a user liking a playlist
+        """
+        user, playlist = db.get_user(username), db.get_playlist(playlist_name)
+        if user == db.NOT_FOUND:
+            raise(wz.NotFound("User not found"))
+        elif playlist == db.NOT_FOUND:
+            raise(wz.NotFound("Playlist not found"))
+        elif playlist_name in user['playlists']:
+            raise(wz.NotAcceptable("User has already liked this playlist"))
+        else:
+            db.update_playlist(playlist_name, {"$inc": {"likes": 1}})
+            db.update_user(username, {"$push": {"playlists": playlist_name}})
+            db.update_user(username, {"$inc": {"numPlaylists": 1}})
+            return f"{username} added {playlist_name} to their playlists"
+
+
+@api.route('/users/<username>/unlike_playlist/<playlist_name>')
+class UnlikePlaylist(Resource):
+    """
+    This class supports a user unliking a playlist
+    """
+    @api.response(HTTPStatus.OK, 'Success')
+    @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
+    @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
+    def post(self, username, playlist_name):
+        """
+        This method supports a user unliking a playlist
+        """
+        user, playlist = db.get_user(username), db.get_playlist(playlist_name)
+        if user == db.NOT_FOUND:
+            raise(wz.NotFound("User not found"))
+        elif playlist == db.NOT_FOUND:
+            raise(wz.NotFound("Playlist not found"))
+        elif playlist_name not in user["playlists"]:
+            raise(wz.NotFound("Playlist not in user's likes"))
+        else:
+            db.update_playlist(playlist_name, {"$inc": {"likes": -1}})
+            db.update_user(username, {"$pull": {"playlists": playlist_name}})
+            db.update_user(username, {"$inc": {"numPlaylists": -1}})
+            return f"{username} removed {playlist_name} from their playlists"
 
 # PLAYLIST METHODS
 
@@ -198,3 +312,49 @@ class DeletePlaylist(Resource):
         elif ret == db.DUPLICATE:
             raise (wz.NotAcceptable("Playlist already exists."))
         return f"{playlist_name} deleted."
+
+
+@api.route('/playlists/<pl_name>/add_song/<song_name>')
+class AddToPlaylist(Resource):
+    """
+    This class supports adding a song to a playlist in the database.
+    """
+    @api.response(HTTPStatus.OK, 'Success')
+    @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
+    @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
+    def post(self, pl_name, song_name):
+        """
+        This method adds a song to a playlist in the database
+        """
+        playlist = db.get_playlist(pl_name)
+        if playlist == db.NOT_FOUND:
+            raise (wz.NotFound("Playlist db not found."))
+        else:
+            if song_name in playlist["songs"]:
+                raise (wz.NotAcceptable("song already in playlist"))
+            else:
+                db.update_playlist(pl_name, {"$push": {"songs": song_name}})
+                return f"{song_name} added to {pl_name}."
+
+
+@api.route('/playlists/<pl_name>/remove_song/<song_name>')
+class RemoveFromPlaylist(Resource):
+    """
+    This class supports removing a song from a playlist in the database.
+    """
+    @api.response(HTTPStatus.OK, 'Success')
+    @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
+    @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
+    def post(self, pl_name, song_name):
+        """
+        This method removes a song from a playlist in the database
+        """
+        playlist = db.get_playlist(pl_name)
+        if playlist == db.NOT_FOUND:
+            raise (wz.NotFound("Playlist not found."))
+        else:
+            if song_name not in playlist["songs"]:
+                raise (wz.NotFound("song not in playlist"))
+            else:
+                db.update_playlist(pl_name, {"$pull": {"songs": song_name}})
+                return f"{song_name} removed from {pl_name}."

@@ -15,7 +15,6 @@ if os.environ.get("TEST_MODE", ''):
     DB_NM = "putmeonDB_test"
 
 CONN_STR = f"{CLOUD_MDB}://{USER_NM}:{PASSWD}@{CLOUD_SVC}/{DB_NM}?{DB_PARAMS}"
-print(CONN_STR)
 
 REMOTE = '1'
 LOCAL = '0'
@@ -29,10 +28,10 @@ def get_client():
     """
     global client
     if os.environ.get("LOCAL_MONGO", REMOTE) == LOCAL:
-        print("connecting to local mongo")
+        print("Connecting to local mongo")
         client = pm.MongoClient()
     else:
-        print("connecting to remote mongo")
+        print("Connecting to remote mongo")
         client = pm.MongoClient(CONN_STR)  # , server_api=ServerApi('1'))
     return client
 
@@ -67,3 +66,10 @@ def insert_doc(collect_nm, doc):
     insert a doc into a certain collection
     """
     client[DB_NM][collect_nm].insert_one(doc)
+
+
+def update_doc(collect_nm, filters, update):
+    """
+    updates a doc given filters and new values
+    """
+    client[DB_NM][collect_nm].update_one(filters, update)
