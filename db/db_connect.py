@@ -55,7 +55,8 @@ def del_many(collect_nm, filters={}):
     """
     delete all records for some filter
     """
-    return client[DB_NM][collect_nm].delete_many(filters)
+    if os.environ.get("TEST_MODE", ''):
+        return client[DB_NM][collect_nm].delete_many(filters)
 
 
 def fetch_all(collect_nm, key_nm):

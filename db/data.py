@@ -5,7 +5,7 @@ Gradually, we will fill in actual calls to our datastore.
 """
 
 # import json
-import os
+# import os
 import db.db_connect as dbc
 
 PLAYLISTS = "playlists"
@@ -151,6 +151,5 @@ def empty():
     empty out the test database
     ONLY IF IN TEST_MODE
     """
-    if os.environ.get("TEST_MODE", ''):
-        dbc.del_many(USERS)
-        dbc.del_many(PLAYLISTS)
+    dbc.del_many(USERS)
+    dbc.del_many(PLAYLISTS)

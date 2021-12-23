@@ -298,12 +298,18 @@ class DeletePlaylist(Resource):
         """
         This method deletes a playlist from the database
         """
-        ret = db.del_playlist(playlist_name)
+        ret = db.get_playlist(playlist_name)
         if ret == db.NOT_FOUND:
             raise (wz.NotFound("Playlist db not found."))
-        elif ret == db.DUPLICATE:
-            raise (wz.NotAcceptable("Playlist already exists."))
-        return f"{playlist_name} deleted."
+        else:
+            up = UnlikePlaylist(Resource)
+            for user in db.get_users():
+                try:
+                    up.post(playlist_name, user)
+                except wz.NotFound:
+                    pass
+            db.del_playlist(playlist_name)
+            return f"{playlist_name} deleted."
 
 
 @api.route('/playlists/<pl_name>/add_song/<song_name>')
