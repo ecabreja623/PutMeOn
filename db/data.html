@@ -1,0 +1,59 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module data</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>data</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/jdahhan/PutMeOn/db/data.py">/home/jdahhan/PutMeOn/db/data.py</a></font></td></tr></table>
+    <p><tt>This&nbsp;file&nbsp;will&nbsp;manage&nbsp;interactions&nbsp;with&nbsp;our&nbsp;data&nbsp;store.<br>
+At&nbsp;first,&nbsp;it&nbsp;will&nbsp;just&nbsp;contain&nbsp;stubs&nbsp;that&nbsp;return&nbsp;fake&nbsp;data.<br>
+Gradually,&nbsp;we&nbsp;will&nbsp;fill&nbsp;in&nbsp;actual&nbsp;calls&nbsp;to&nbsp;our&nbsp;datastore.</tt></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="db.db_connect.html">db.db_connect</a><br>
+</td><td width="25%" valign=top></td><td width="25%" valign=top></td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-add_playlist"><strong>add_playlist</strong></a>(playlist_name)</dt><dd><tt>creates&nbsp;a&nbsp;playlist,&nbsp;returns&nbsp;whether&nbsp;successful&nbsp;or&nbsp;not</tt></dd></dl>
+ <dl><dt><a name="-add_user"><strong>add_user</strong></a>(username)</dt><dd><tt>adds&nbsp;a&nbsp;user,&nbsp;returns&nbsp;whether&nbsp;successful&nbsp;or&nbsp;not</tt></dd></dl>
+ <dl><dt><a name="-del_playlist"><strong>del_playlist</strong></a>(playlist_name)</dt><dd><tt>delete&nbsp;a&nbsp;playlist&nbsp;by&nbsp;playlist&nbsp;name</tt></dd></dl>
+ <dl><dt><a name="-del_user"><strong>del_user</strong></a>(username)</dt><dd><tt>delete&nbsp;a&nbsp;user&nbsp;by&nbsp;username</tt></dd></dl>
+ <dl><dt><a name="-empty"><strong>empty</strong></a>()</dt><dd><tt>empty&nbsp;out&nbsp;the&nbsp;test&nbsp;database<br>
+ONLY&nbsp;IF&nbsp;IN&nbsp;TEST_MODE</tt></dd></dl>
+ <dl><dt><a name="-get_playlist"><strong>get_playlist</strong></a>(playlist_name)</dt><dd><tt>returns&nbsp;a&nbsp;playlist&nbsp;given&nbsp;its&nbsp;name,&nbsp;else&nbsp;NOT_FOUND</tt></dd></dl>
+ <dl><dt><a name="-get_playlists"><strong>get_playlists</strong></a>()</dt><dd><tt>returns&nbsp;all&nbsp;playlists</tt></dd></dl>
+ <dl><dt><a name="-get_user"><strong>get_user</strong></a>(username)</dt><dd><tt>return&nbsp;a&nbsp;user&nbsp;given&nbsp;a&nbsp;username,&nbsp;else&nbsp;NOT_FOUND</tt></dd></dl>
+ <dl><dt><a name="-get_users"><strong>get_users</strong></a>()</dt><dd><tt>returns&nbsp;all&nbsp;users</tt></dd></dl>
+ <dl><dt><a name="-playlist_exists"><strong>playlist_exists</strong></a>(playlist_name)</dt><dd><tt>return&nbsp;true/false&nbsp;whether&nbsp;or&nbsp;not&nbsp;playlist&nbsp;exists</tt></dd></dl>
+ <dl><dt><a name="-update_playlist"><strong>update_playlist</strong></a>(playlist_name, update)</dt><dd><tt>update&nbsp;a&nbsp;playlist&nbsp;given&nbsp;a&nbsp;change</tt></dd></dl>
+ <dl><dt><a name="-update_user"><strong>update_user</strong></a>(user_name, update)</dt><dd><tt>update&nbsp;an&nbsp;existing&nbsp;user&nbsp;given&nbsp;new&nbsp;data</tt></dd></dl>
+ <dl><dt><a name="-user_exists"><strong>user_exists</strong></a>(username)</dt><dd><tt>return&nbsp;true/false&nbsp;whether&nbsp;or&nbsp;not&nbsp;user&nbsp;exists</tt></dd></dl>
+</td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#55aa55">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><strong>DUPLICATE</strong> = 2<br>
+<strong>NOT_FOUND</strong> = 1<br>
+<strong>OK</strong> = 0<br>
+<strong>PLAYLISTS</strong> = 'playlists'<br>
+<strong>PLNAME</strong> = 'playlistName'<br>
+<strong>USERNAME</strong> = 'userName'<br>
+<strong>USERS</strong> = 'users'<br>
+<strong>client</strong> = MongoClient(host=['cluster0-shard-00-02.c45bk.mo...in', replicaset='atlas-d4d0vh-shard-0', tls=True)</td></tr></table>
+</body></html>
