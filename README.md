@@ -3,11 +3,13 @@
 ## Requirements
 
 - Create a profile page that displays their data
-- Search for other users/friends 
+- Search for other users/friends/playlists 
 - Create, delete, and update playlists
 - List playlists
 - Create and delete users 
 - List users 
+- Add/remove friends
+- Like/unlike playlists
 
 ## Design
 
@@ -20,14 +22,21 @@
 - Use Travis as the CI/CD pipeline
 - Use Heroku to deploy the app
 
-- Users can create a user using the '/create_user' endpoint
+- Users can create a user using the '/users/create' endpoint
     - users must pass a unique username 
-- Users can delete a user using the '/delete_user' endpoint
-- Users can create playlists using the '/create_playlist' 
-    - users must pass playlist name 
+- Users can delete a user using the '/users/delete' endpoint
+- Users can create playlists using the '/playlists/create' 
+    - users must pass unique playlist name 
     - user must already exist
-- Users can delete their playlist using the 'delete_playlist' endpoint 
-- Users can update their playlist using the 'update_playlist' endpoint
-- Users can search for their friend using the 'search' endpoint 
+- Users can delete their playlist using the '/playlists/delete' endpoint 
+- Users can update their playlist using the '/playlists/add_song' and '/playlists/delete_song' endpoints
+- Users can search for their friend using the '/users/search' endpoint 
     - user must pass their friend's username 
-
+- Users can search for a playlist using the '/playlists/search' endpoint
+- Users can add or remove one another as friends using the '/users/add_friend' and 'users/remove_friend' endpoints
+    - Both users must be distinct and already exist
+    - Users cannot be friends prior to adding one another
+    - Users must be friends prior to removing one another
+- Users can like/unlike a playlist using the 'users/like_playlist' and 'users/unlike_playlist' endpoints
+    - Playlist cannot already be liked if user is liking it
+    - Playlist must already be liked if user is unliking it
