@@ -19,7 +19,7 @@ def new_entity_name(entity_type):
 
 class EndpointTestCase(TestCase):
     def setUp(self):
-        pass
+        db.empty()
 
     def tearDown(self):
         pass
@@ -130,6 +130,27 @@ class EndpointTestCase(TestCase):
             self.assertFalse(True)
         except wz.NotFound:
             self.assertFalse(False)
+
+    def test_delete_user3(self):
+        """
+        Post-condition 3: deleting a user results in friends being removed from its database and it being removed from a playlist's likes
+        """
+        newuser = new_entity_name("user")
+        db.add_user(newuser)
+        newfriend = new_entity_name("user")
+        db.add_user(newfriend)
+        af = ep.BefriendUser(Resource)
+        af.post(newuser, newfriend)
+        newpl = new_entity_name("playlist")
+        db.add_playlist(newpl)
+        lp = ep.LikePlaylist(Resource)
+        lp.post(newuser, newpl)
+        du = ep.DeleteUser(Resource)
+        du.post(newuser)
+        friend = db.get_user(newfriend)
+        pl = db.get_playlist(newpl)
+        self.assertNotIn(newuser, friend['friends'])
+        self.assertNotIn(newuser, pl['likes'])
 
     def test_add_friends1(self):
         """
@@ -254,7 +275,7 @@ class EndpointTestCase(TestCase):
         u = db.get_user(newuser)
         pl = db.get_playlist(newpl)
         self.assertIn(newpl, u["playlists"])
-        self.assertEqual(pl["likes"], 1)
+        self.assertIn(newuser, pl["likes"])
 
     def test_like_playlist2(self):
         """
@@ -315,7 +336,7 @@ class EndpointTestCase(TestCase):
         u = db.get_user(newuser)
         pl = db.get_playlist(newpl)
         self.assertNotIn(newpl, u["playlists"])
-        self.assertEqual(pl["likes"], 0)
+        self.assertNotIn(newuser, pl["likes"])
     
     def test_unlike_playlist2(self):
         """
@@ -459,6 +480,20 @@ class EndpointTestCase(TestCase):
         except wz.NotFound:
             self.assertFalse(False)
 
+    def test_delete_playlist3(self):
+        """
+        Post-condition 3: deleting a playlist results in it being removed from the likes of all users who liked it
+        """
+        newuser = new_entity_name("user")
+        newpl = new_entity_name("playlist")
+        db.add_playlist(newpl)
+        db.add_user(newuser)
+        lp = ep.LikePlaylist(Resource)
+        lp.post(newuser, newpl)
+        dp = ep.DeletePlaylist(Resource)
+        dp.post(newpl)
+        user = db.get_user(newuser)
+        self.assertNotIn(newpl, user['playlists'])
 
     def test_add_song1(self):
         """

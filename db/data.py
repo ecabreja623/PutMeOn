@@ -98,7 +98,7 @@ def add_playlist(playlist_name):
         return DUPLICATE
     else:
         dbc.insert_doc(PLAYLISTS, {PLNAME: playlist_name,
-                                   "likes": 0,
+                                   "likes": [],
                                    "songs": []
                                    })
         return OK

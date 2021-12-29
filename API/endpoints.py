@@ -193,10 +193,11 @@ class LikePlaylist(Resource):
             raise(wz.NotFound("User not found"))
         elif playlist == db.NOT_FOUND:
             raise(wz.NotFound("Playlist not found"))
-        elif playlist_name in user['playlists']:
+        elif playlist_name in user['playlists'] or \
+                username in playlist['likes']:
             raise(wz.NotAcceptable("User has already liked this playlist"))
         else:
-            db.update_playlist(playlist_name, {"$inc": {"likes": 1}})
+            db.update_playlist(playlist_name, {"$push": {"likes": username}})
             db.update_user(username, {"$push": {"playlists": playlist_name}})
             db.update_user(username, {"$inc": {"numPlaylists": 1}})
             return f"{username} added {playlist_name} to their playlists"
@@ -219,10 +220,11 @@ class UnlikePlaylist(Resource):
             raise(wz.NotFound("User not found"))
         elif playlist == db.NOT_FOUND:
             raise(wz.NotFound("Playlist not found"))
-        elif playlist_name not in user["playlists"]:
+        elif playlist_name not in user["playlists"] or \
+                username not in playlist['likes']:
             raise(wz.NotFound("Playlist not in user's likes"))
         else:
-            db.update_playlist(playlist_name, {"$inc": {"likes": -1}})
+            db.update_playlist(playlist_name, {"$pull": {"likes": username}})
             db.update_user(username, {"$pull": {"playlists": playlist_name}})
             db.update_user(username, {"$inc": {"numPlaylists": -1}})
             return f"{username} removed {playlist_name} from their playlists"
@@ -298,16 +300,13 @@ class DeletePlaylist(Resource):
         """
         This method deletes a playlist from the database
         """
-        ret = db.get_playlist(playlist_name)
-        if ret == db.NOT_FOUND:
+        playlist = db.get_playlist(playlist_name)
+        if playlist == db.NOT_FOUND:
             raise (wz.NotFound("Playlist db not found."))
         else:
             up = UnlikePlaylist(Resource)
-            for user in db.get_users():
-                try:
-                    up.post(playlist_name, user)
-                except wz.NotFound:
-                    pass
+            for user in playlist['likes']:
+                up.post(user, playlist_name)
             db.del_playlist(playlist_name)
             return f"{playlist_name} deleted."
 

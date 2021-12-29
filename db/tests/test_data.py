@@ -127,10 +127,10 @@ class DBTestCase(TestCase):
         """
         db.add_playlist(FAKE_PLAYLIST)
         db.update_playlist(FAKE_PLAYLIST, {"$push": {"songs":"FAKE SONG"}})
-        db.update_playlist(FAKE_PLAYLIST, {"$inc": {"likes":1}})
+        db.update_playlist(FAKE_PLAYLIST, {"$push": {"likes":"FAKE USER"}})
         pl = db.get_playlist(FAKE_PLAYLIST)
         self.assertIn("FAKE SONG", pl["songs"])
-        self.assertEqual(1, pl["likes"])
+        self.assertIn("FAKE USER", pl["likes"])
         db.update_playlist(FAKE_PLAYLIST, {"$pull": {"songs":"FAKE SONG"}})
         pl = db.get_playlist(FAKE_PLAYLIST)
         self.assertNotIn("FAKE SONG", pl["songs"])
