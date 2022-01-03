@@ -40,3 +40,4 @@
 - Users can like/unlike a playlist using the 'users/like_playlist' and 'users/unlike_playlist' endpoints
     - Playlist cannot already be liked if user is liking it
     - Playlist must already be liked if user is unliking it
+
