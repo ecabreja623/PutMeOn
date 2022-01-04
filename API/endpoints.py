@@ -7,7 +7,8 @@ from http import HTTPStatus
 from flask import Flask
 from flask_restx import Resource, Api
 import werkzeug.exceptions as wz
-import db.data as db
+import db.data_playlists as dbp
+import db.data_users as dbu
 
 app = Flask(__name__)
 api = Api(app)
@@ -57,7 +58,7 @@ class ListUsers(Resource):
         """
         Returns a list of all the users
         """
-        users = db.get_users()
+        users = dbu.get_users()
         return users
 
 
@@ -73,8 +74,8 @@ class CreateUser(Resource):
         """
         This method adds a user to the database
         """
-        ret = db.add_user(username)
-        if ret == db.DUPLICATE:
+        ret = dbu.add_user(username)
+        if ret == dbu.DUPLICATE:
             raise (wz.NotAcceptable("User already exists."))
         return f"{username} added."
 
@@ -91,8 +92,8 @@ class SearchUser(Resource):
         """
         This method finds a user in the database
         """
-        ret = db.get_user(username)
-        if ret == db.NOT_FOUND:
+        ret = dbu.get_user(username)
+        if ret == dbu.NOT_FOUND:
             raise (wz.NotFound("User not found."))
         return ret
 
@@ -109,8 +110,8 @@ class DeleteUser(Resource):
         """
         This method deletes a user from the database
         """
-        ret = db.get_user(username)
-        if ret == db.NOT_FOUND:
+        ret = dbu.get_user(username)
+        if ret == dbu.NOT_FOUND:
             raise (wz.NotFound("User db not found."))
         else:
             unliker = UnlikePlaylist(Resource)
@@ -119,7 +120,7 @@ class DeleteUser(Resource):
             unfriender = UnfriendUser(Resource)
             for friend in ret['friends']:
                 unfriender.post(username, friend)
-            db.del_user(username)
+            dbu.del_user(username)
         return f"{username} deleted."
 
 
@@ -136,16 +137,13 @@ class BefriendUser(Resource):
         This method adds two users to each others friend lists
         """
         if usern1 != usern2:
-            user1, user2 = db.get_user(usern1), db.get_user(usern2)
-            if user1 == db.NOT_FOUND or user2 == db.NOT_FOUND:
+            user1, user2 = dbu.get_user(usern1), dbu.get_user(usern2)
+            if user1 == dbu.NOT_FOUND or user2 == dbu.NOT_FOUND:
                 raise(wz.NotFound("At least one user not found"))
             elif usern1 in user2["friends"] or usern2 in user1["friends"]:
                 raise(wz.NotAcceptable("Users are already friends"))
             else:
-                db.update_user(usern2, {"$push": {"friends": usern1}})
-                db.update_user(usern1, {"$push": {"friends": usern2}})
-                db.update_user(usern2, {"$inc": {"numFriends": 1}})
-                db.update_user(usern1, {"$inc": {"numFriends": 1}})
+                dbu.bef_user(usern1, usern2)
                 return "Users added eachother as friends"
         else:
             raise(wz.NotAcceptable("User cannot add themself as a friend"))
@@ -163,14 +161,11 @@ class UnfriendUser(Resource):
         """
         This method removes two users from each others friend lists
         """
-        user1, user2 = db.get_user(usern1), db.get_user(usern2)
-        if user1 == db.NOT_FOUND or user2 == db.NOT_FOUND:
+        user1, user2 = dbu.get_user(usern1), dbu.get_user(usern2)
+        if user1 == dbu.NOT_FOUND or user2 == dbu.NOT_FOUND:
             raise(wz.NotFound("At least one user not found"))
         elif usern1 in user2["friends"] or usern2 in user1["friends"]:
-            db.update_user(usern2, {"$pull": {"friends": usern1}})
-            db.update_user(usern1, {"$pull": {"friends": usern2}})
-            db.update_user(usern2, {"$inc": {"numFriends": -1}})
-            db.update_user(usern1, {"$inc": {"numFriends": -1}})
+            dbu.unf_user(usern1, usern2)
             return "Users removed eachother as friends"
         else:
             raise(wz.NotAcceptable("Users are not friends"))
@@ -188,18 +183,17 @@ class LikePlaylist(Resource):
         """
         This method supports a user liking a playlist
         """
-        user, playlist = db.get_user(username), db.get_playlist(playlist_name)
-        if user == db.NOT_FOUND:
+        user = dbu.get_user(username)
+        playlist = dbp.get_playlist(playlist_name)
+        if user == dbu.NOT_FOUND:
             raise(wz.NotFound("User not found"))
-        elif playlist == db.NOT_FOUND:
+        elif playlist == dbp.NOT_FOUND:
             raise(wz.NotFound("Playlist not found"))
         elif playlist_name in user['playlists'] or \
                 username in playlist['likes']:
             raise(wz.NotAcceptable("User has already liked this playlist"))
         else:
-            db.update_playlist(playlist_name, {"$push": {"likes": username}})
-            db.update_user(username, {"$push": {"playlists": playlist_name}})
-            db.update_user(username, {"$inc": {"numPlaylists": 1}})
+            dbu.like_playlist(username, playlist_name)
             return f"{username} added {playlist_name} to their playlists"
 
 
@@ -215,18 +209,17 @@ class UnlikePlaylist(Resource):
         """
         This method supports a user unliking a playlist
         """
-        user, playlist = db.get_user(username), db.get_playlist(playlist_name)
-        if user == db.NOT_FOUND:
+        user = dbu.get_user(username)
+        playlist = dbp.get_playlist(playlist_name)
+        if user == dbu.NOT_FOUND:
             raise(wz.NotFound("User not found"))
-        elif playlist == db.NOT_FOUND:
+        elif playlist == dbp.NOT_FOUND:
             raise(wz.NotFound("Playlist not found"))
         elif playlist_name not in user["playlists"] or \
                 username not in playlist['likes']:
             raise(wz.NotFound("Playlist not in user's likes"))
         else:
-            db.update_playlist(playlist_name, {"$pull": {"likes": username}})
-            db.update_user(username, {"$pull": {"playlists": playlist_name}})
-            db.update_user(username, {"$inc": {"numPlaylists": -1}})
+            dbu.unlike_playlist(username, playlist_name)
             return f"{username} removed {playlist_name} from their playlists"
 
 # PLAYLIST METHODS
@@ -243,7 +236,7 @@ class ListPlaylists(Resource):
         """
         Returns a list of all the playlists
         """
-        playlists = db.get_playlists()
+        playlists = dbp.get_playlists()
         if playlists is None:
             raise (wz.NotFound("Users db not found."))
         else:
@@ -262,10 +255,10 @@ class CreatePlaylist(Resource):
         """
         This method adds a playlist to the database
         """
-        ret = db.add_playlist(playlist_name)
-        if ret == db.NOT_FOUND:
+        ret = dbp.add_playlist(playlist_name)
+        if ret == dbp.NOT_FOUND:
             raise (wz.NotFound("Playlist db not found."))
-        elif ret == db.DUPLICATE:
+        elif ret == dbp.DUPLICATE:
             raise (wz.NotAcceptable("Playlist already exists."))
         return f"{playlist_name} added."
 
@@ -282,8 +275,8 @@ class SearchPlaylist(Resource):
         """
         This method searches for a playlist in the database
         """
-        ret = db.get_playlist(playlist_name)
-        if ret == db.NOT_FOUND:
+        ret = dbp.get_playlist(playlist_name)
+        if ret == dbp.NOT_FOUND:
             raise (wz.NotFound("playlist not found."))
         return ret
 
@@ -300,14 +293,14 @@ class DeletePlaylist(Resource):
         """
         This method deletes a playlist from the database
         """
-        playlist = db.get_playlist(playlist_name)
-        if playlist == db.NOT_FOUND:
+        playlist = dbp.get_playlist(playlist_name)
+        if playlist == dbp.NOT_FOUND:
             raise (wz.NotFound("Playlist db not found."))
         else:
             up = UnlikePlaylist(Resource)
             for user in playlist['likes']:
                 up.post(user, playlist_name)
-            db.del_playlist(playlist_name)
+            dbp.del_playlist(playlist_name)
             return f"{playlist_name} deleted."
 
 
@@ -323,14 +316,14 @@ class AddToPlaylist(Resource):
         """
         This method adds a song to a playlist in the database
         """
-        playlist = db.get_playlist(pl_name)
-        if playlist == db.NOT_FOUND:
+        playlist = dbp.get_playlist(pl_name)
+        if playlist == dbp.NOT_FOUND:
             raise (wz.NotFound("Playlist db not found."))
         else:
             if song_name in playlist["songs"]:
                 raise (wz.NotAcceptable("song already in playlist"))
             else:
-                db.update_playlist(pl_name, {"$push": {"songs": song_name}})
+                dbp.add_song(pl_name, song_name)
                 return f"{song_name} added to {pl_name}."
 
 
@@ -346,12 +339,12 @@ class RemoveFromPlaylist(Resource):
         """
         This method removes a song from a playlist in the database
         """
-        playlist = db.get_playlist(pl_name)
-        if playlist == db.NOT_FOUND:
+        playlist = dbp.get_playlist(pl_name)
+        if playlist == dbp.NOT_FOUND:
             raise (wz.NotFound("Playlist not found."))
         else:
             if song_name not in playlist["songs"]:
                 raise (wz.NotFound("song not in playlist"))
             else:
-                db.update_playlist(pl_name, {"$pull": {"songs": song_name}})
+                dbp.rem_song(pl_name, song_name)
                 return f"{song_name} removed from {pl_name}."
