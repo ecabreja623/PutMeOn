@@ -1,7 +1,6 @@
 import os
 import json
 import pymongo as pm
-# from pymongo.server_api import ServerApi
 import bson.json_util as bsutil
 
 USER_NM = os.environ.get("MONGO_UN", 'user')
