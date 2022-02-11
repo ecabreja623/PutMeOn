@@ -120,7 +120,7 @@ class EndpointTestCase(TestCase):
         dp = ep.DeletePlaylist(Resource)
         dp.post(newpl)
         user = dbu.get_user(newuser)
-        self.assertNotIn(newpl, user['playlists'])
+        self.assertNotIn(newpl, user['likedPlaylists'])
 
     def test_add_song1(self):
         """

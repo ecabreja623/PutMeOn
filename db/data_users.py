@@ -57,10 +57,11 @@ def add_user(username):
         return DUPLICATE
     else:
         dbc.insert_doc(USERS, {USERNAME: username,
-                               "numFriends": 0,
+                               "outgoingRequests": [],
+                               "incomingRequests": [],
                                "friends": [],
-                               "numPlaylists": 0,
-                               "playlists": []
+                               "ownedPlaylists": [],
+                               "likedPlaylists": [],
                                })
         return OK
 
@@ -93,8 +94,6 @@ def bef_user(usern1, usern2):
     """
     update_user(usern2, {"$push": {"friends": usern1}})
     update_user(usern1, {"$push": {"friends": usern2}})
-    update_user(usern2, {"$inc": {"numFriends": 1}})
-    update_user(usern1, {"$inc": {"numFriends": 1}})
 
 
 def unf_user(usern1, usern2):
@@ -104,8 +103,6 @@ def unf_user(usern1, usern2):
     """
     update_user(usern2, {"$pull": {"friends": usern1}})
     update_user(usern1, {"$pull": {"friends": usern2}})
-    update_user(usern2, {"$inc": {"numFriends": -1}})
-    update_user(usern1, {"$inc": {"numFriends": -1}})
 
 
 def like_playlist(username, playlist_name):
@@ -114,8 +111,7 @@ def like_playlist(username, playlist_name):
     also adds the user to the playlist's likes
     """
     dbp.update_playlist(playlist_name, {"$push": {"likes": username}})
-    update_user(username, {"$push": {"playlists": playlist_name}})
-    update_user(username, {"$inc": {"numPlaylists": 1}})
+    update_user(username, {"$push": {"likedPlaylists": playlist_name}})
 
 
 def unlike_playlist(username, playlist_name):
@@ -124,8 +120,7 @@ def unlike_playlist(username, playlist_name):
     also removing the user from the playlist's likes
     """
     dbp.update_playlist(playlist_name, {"$pull": {"likes": username}})
-    update_user(username, {"$pull": {"playlists": playlist_name}})
-    update_user(username, {"$inc": {"numPlaylists": -1}})
+    update_user(username, {"$pull": {"likedPlaylists": playlist_name}})
 
 
 def empty():

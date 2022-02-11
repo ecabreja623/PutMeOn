@@ -117,7 +117,7 @@ class DeleteUser(Resource):
             raise (wz.NotFound("User db not found."))
         else:
             unliker = UnlikePlaylist(Resource)
-            for pl in ret["playlists"]:
+            for pl in ret["likedPlaylists"]:
                 unliker.post(username, pl)
             unfriender = UnfriendUser(Resource)
             for friend in ret['friends']:
@@ -191,7 +191,7 @@ class LikePlaylist(Resource):
             raise(wz.NotFound("User not found"))
         elif playlist == dbp.NOT_FOUND:
             raise(wz.NotFound("Playlist not found"))
-        elif playlist_name in user['playlists'] or \
+        elif playlist_name in user['likedPlaylists'] or \
                 username in playlist['likes']:
             raise(wz.NotAcceptable("User has already liked this playlist"))
         else:
@@ -217,7 +217,7 @@ class UnlikePlaylist(Resource):
             raise(wz.NotFound("User not found"))
         elif playlist == dbp.NOT_FOUND:
             raise(wz.NotFound("Playlist not found"))
-        elif playlist_name not in user["playlists"] or \
+        elif playlist_name not in user["likedPlaylists"] or \
                 username not in playlist['likes']:
             raise(wz.NotFound("Playlist not in user's likes"))
         else:

@@ -71,10 +71,8 @@ class DBTestCase(TestCase):
         """
         dbu.add_user(FAKE_USER)
         dbu.update_user(FAKE_USER, {"$push": {"friends":"fake friend"}})
-        dbu.update_user(FAKE_USER, {"$inc": {"numFriends":1}})
         u = dbu.get_user(FAKE_USER)
         self.assertIn("fake friend", u["friends"])
-        self.assertEqual(1, u["numFriends"])
         dbu.update_user(FAKE_USER, {"$pull": {"friends":"fake friend"}})
         u = dbu.get_user(FAKE_USER)
         self.assertNotIn("fake friend", u["friends"])
@@ -92,8 +90,6 @@ class DBTestCase(TestCase):
         u2 = dbu.get_user(new2)
         self.assertIn(new1, u2["friends"])
         self.assertIn(new2, u1["friends"])
-        self.assertEqual(u1["numFriends"], 1)
-        self.assertEqual(u2["numFriends"], 1)
     
     def test_unf_user(self):
         """
@@ -111,8 +107,6 @@ class DBTestCase(TestCase):
         u2 = dbu.get_user(new2)
         self.assertNotIn(new1, u2["friends"])
         self.assertNotIn(new2, u1["friends"])
-        self.assertEqual(u1["numFriends"], 0)
-        self.assertEqual(u2["numFriends"], 0)
     
     def test_like_playlist(self):
         """
@@ -125,7 +119,7 @@ class DBTestCase(TestCase):
         dbu.like_playlist(newuser, newpl)
         u = dbu.get_user(newuser)
         pl = dbp.get_playlist(newpl)
-        self.assertIn(newpl, u["playlists"])
+        self.assertIn(newpl, u["likedPlaylists"])
         self.assertIn(newuser, pl["likes"])
 
     def test_unlike_playlist(self):
@@ -140,7 +134,7 @@ class DBTestCase(TestCase):
         dbu.unlike_playlist(newuser, newpl)
         u = dbu.get_user(newuser)
         pl = dbp.get_playlist(newpl)
-        self.assertNotIn(newpl, u["playlists"])
+        self.assertNotIn(newpl, u["likedPlaylists"])
         self.assertNotIn(newuser, pl["likes"])
 
     def test_empty(self):

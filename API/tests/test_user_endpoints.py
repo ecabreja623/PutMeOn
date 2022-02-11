@@ -156,8 +156,6 @@ class EndpointTestCase(TestCase):
         u2 = dbu.get_user(new2)
         self.assertIn(new1, u2["friends"])
         self.assertIn(new2, u1["friends"])
-        self.assertEqual(u1["numFriends"], 1)
-        self.assertEqual(u2["numFriends"], 1)
 
     def test_add_friends2(self):
         """
@@ -206,9 +204,7 @@ class EndpointTestCase(TestCase):
         u2 = dbu.get_user(new2)
         self.assertNotIn(new1, u2["friends"])
         self.assertNotIn(new2, u1["friends"])
-        self.assertEqual(u1["numFriends"], 0)
-        self.assertEqual(u2["numFriends"], 0)
-    
+
     def test_remove_friends2(self):
         """
         Post-condition 2: two non friends cannot remove one another
@@ -242,7 +238,7 @@ class EndpointTestCase(TestCase):
         lp.post(newuser, newpl)
         u = dbu.get_user(newuser)
         pl = dbp.get_playlist(newpl)
-        self.assertIn(newpl, u["playlists"])
+        self.assertIn(newpl, u["likedPlaylists"])
         self.assertIn(newuser, pl["likes"])
 
     def test_like_playlist2(self):
@@ -291,7 +287,7 @@ class EndpointTestCase(TestCase):
         up.post(newuser, newpl)
         u = dbu.get_user(newuser)
         pl = dbp.get_playlist(newpl)
-        self.assertNotIn(newpl, u["playlists"])
+        self.assertNotIn(newpl, u["likedPlaylists"])
         self.assertNotIn(newuser, pl["likes"])
     
     def test_unlike_playlist2(self):
