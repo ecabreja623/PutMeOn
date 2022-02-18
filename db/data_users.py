@@ -89,17 +89,24 @@ def del_user(username):
 
 def bef_user(usern1, usern2):
     """
-    befriends 2 users by adding each other to their friends list
-    also increments their friend count
+    befriends 2 users by adding each other to their friends list and removing one another from existing friend reqeusts
     """
     update_user(usern2, {"$push": {"friends": usern1}})
     update_user(usern1, {"$push": {"friends": usern2}})
+    update_user(usern1, {"$pull": {"incomingRequests": usern2}})
+    update_user(usern1, {"$pull": {"outgoingRequests": usern2}})
+    update_user(usern2, {"$pull": {"incomingRequests": usern1}})
+    update_user(usern2, {"$pull": {"outgoingRequests": usern1}})
+
+
+def req_user(usern1, usern2):
+    update_user(usern2, {"$push": {"incomingRequests": usern1}})
+    update_user(usern1, {"$push": {"outgoingRequests": usern2}})
 
 
 def unf_user(usern1, usern2):
     """
     unfriends 2 users by removing one another from their friends lists
-    also decrements their friend count
     """
     update_user(usern2, {"$pull": {"friends": usern1}})
     update_user(usern1, {"$pull": {"friends": usern2}})
