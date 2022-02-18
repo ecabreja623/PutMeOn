@@ -146,11 +146,11 @@ class RequestUser(Resource):
                 raise(wz.NotAcceptable("Users are already friends"))
             elif usern1 in user2['outgoingRequests'] or \
                     usern2 in user1['incomingRequests']:
-                return(wz.NotAcceptable("User2 already sent\
+                raise(wz.NotAcceptable("User2 already sent\
                      user1 a friend request"))
             elif usern2 in user1['outgoingRequests'] or \
                     usern1 in user2['incomingRequests']:
-                return(wz.NotAcceptable("User1 already sent user2 \
+                raise(wz.NotAcceptable("User1 already sent user2 \
                     a friend request"))
             else:
                 dbu.req_user(usern1, usern2)

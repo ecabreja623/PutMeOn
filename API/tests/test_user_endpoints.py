@@ -17,6 +17,10 @@ def new_entity_name(entity_type):
     int_name = random.randint(0,HUGE_NUM)
     return f"new {entity_type}" + str(int_name)
 
+def new_entity(entity="U"):
+    new = new_entity_name(entity)
+    dbu.add_user(new)
+    return new
 
 class EndpointTestCase(TestCase):
     def setUp(self):
@@ -190,6 +194,70 @@ class EndpointTestCase(TestCase):
         dbu.add_user(newuser)
         af = ep.BefriendUser(Resource)
         self.assertRaises(wz.NotAcceptable, af.post, newuser, newuser)
+
+    def test_req_friends1(self):
+        """
+        Post-condition 1: A user can friend request another user
+        """
+        new1 = new_entity()
+        new2 = new_entity()
+        rf = ep.RequestUser(Resource)
+        rf.post(new1, new2)
+        user1 = dbu.get_user(new1)
+        user2 = dbu.get_user(new2)
+        self.assertIn(new2, user1["outgoingRequests"])
+        self.assertIn(new1, user2["incomingRequests"])
+
+    def test_req_friends2(self):
+        """
+        Post-condition 2: requesting a user fails if you have already done it
+        """
+        new1 = new_entity()
+        new2 = new_entity()
+        rf = ep.RequestUser(Resource)
+        rf.post(new1, new2)
+        user1, user2 = dbu.get_user(new1), dbu.get_user(new2)
+        self.assertRaises(wz.NotAcceptable, rf.post, new1, new2)
+
+    def test_req_friends3(self):
+        """
+        Post-condition 3: A user requesting itself fails
+        """
+        new1 = new_entity()
+        rf = ep.RequestUser(Resource)
+        self.assertRaises(wz.NotAcceptable, rf.post, new1, new1)
+
+    def test_req_friends4(self):
+        """
+        Post-condition 4: requesting a user fails if they have requested you first
+        """
+        new1 = new_entity()
+        new2 = new_entity()
+        rf = ep.RequestUser(Resource)
+        rf.post(new1, new2)
+        self.assertRaises(wz.NotAcceptable, rf.post, new2, new1)
+
+    def test_req_friends5(self):
+        """
+        Post-condition 5: requesting a user fails if users are already friends
+        """
+        new1 = new_entity()
+        new2 = new_entity()
+        dbu.bef_user(new1, new2)
+        rf = ep.RequestUser(Resource)
+        self.assertRaises(wz.NotAcceptable, rf.post, new1, new2)
+
+    def test_req_friends6(self):
+        """
+        Post-condition 6: requesting a user fails if either user does not exist
+        """
+        name1 = new_entity_name('user')
+        name2 = new_entity_name('user')
+        rf = ep.RequestUser(Resource)
+        self.assertRaises(wz.NotFound, rf.post, name1, name2)
+        new1 = new_entity()
+        self.assertRaises(wz.NotFound, rf.post, new1, name2)
+        self.assertRaises(wz.NotFound, rf.post, name1, new1)
 
     def test_remove_friends1(self):
         """

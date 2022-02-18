@@ -100,8 +100,6 @@ class DBTestCase(TestCase):
         dbu.add_user(new1)
         dbu.add_user(new2)
         dbu.bef_user(new1, new2)
-        u1 = dbu.get_user(new1)
-        u2 = dbu.get_user(new2)
         dbu.unf_user(new1, new2)
         u1 = dbu.get_user(new1)
         u2 = dbu.get_user(new2)
