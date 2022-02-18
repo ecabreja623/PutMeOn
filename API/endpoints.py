@@ -144,23 +144,27 @@ class RequestUser(Resource):
                 raise(wz.NotFound("At least one user not found"))
             elif usern1 in user2["friends"] or usern2 in user1["friends"]:
                 raise(wz.NotAcceptable("Users are already friends"))
-            elif usern1 in user2['outgoingRequests'] or \ 
+            elif usern1 in user2['outgoingRequests'] or \
                     usern2 in user1['incomingRequests']:
-                return(wz.NotAcceptable("User2 already sent user1 a friend request"))
-            elif usern2 in user1['outgoingRequests'] or \ 
+                return(wz.NotAcceptable("User2 already sent\
+                     user1 a friend request"))
+            elif usern2 in user1['outgoingRequests'] or \
                     usern1 in user2['incomingRequests']:
-                return(wz.NotAcceptable("User1 already sent user2 a friend request"))
+                return(wz.NotAcceptable("User1 already sent user2 \
+                    a friend request"))
             else:
                 dbu.req_user(usern1, usern2)
                 return "User1 sent user2 a friend request"
         else:
-            raise(wz.NotAcceptable("User cannot send themself a friend request"))
+            raise(wz.NotAcceptable("User cannot send themself \
+                a friend request"))
 
 
 @api.route('/users/<usern1>/add_friend/<usern2>')
 class BefriendUser(Resource):
     """
-    This class supports two users adding each other as friends provided user2 has sent user1 a friend request
+    This class supports two users adding each other as friends
+    only if user2 has sent user1 a friend request
     """
     @api.response(HTTPStatus.OK, 'Success')
     @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
@@ -175,12 +179,13 @@ class BefriendUser(Resource):
                 raise(wz.NotFound("At least one user not found"))
             elif usern1 in user2["friends"] or usern2 in user1["friends"]:
                 raise(wz.NotAcceptable("Users are already friends"))
-            elif usern1 in user2['outgoingRequests'] and \ 
+            elif usern1 in user2['outgoingRequests'] and \
                     usern2 in user1['incomingRequests']:
                 dbu.bef_user(usern1, usern2)
                 return "Users added eachother as friends"
             else:
-                return(wz.NotAcceptable("Neither user has sent a friend request"))
+                return(wz.NotAcceptable("Neither user has\
+                     sent a friend request"))
         else:
             raise(wz.NotAcceptable("User cannot add themself as a friend"))
 

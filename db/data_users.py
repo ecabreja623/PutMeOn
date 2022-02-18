@@ -89,7 +89,8 @@ def del_user(username):
 
 def bef_user(usern1, usern2):
     """
-    befriends 2 users by adding each other to their friends list and removing one another from existing friend reqeusts
+    befriends 2 users by adding each other to their friends list
+    removes both users from existing friend request lists
     """
     update_user(usern2, {"$push": {"friends": usern1}})
     update_user(usern1, {"$push": {"friends": usern2}})
