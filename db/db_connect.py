@@ -64,7 +64,7 @@ def fetch_all(collect_nm, key_nm):
     """
     all_docs = []
     for doc in client[DB_NM][collect_nm].find():
-        all_docs.append(bsutil.dumps(doc))
+        all_docs.append(json.loads(bsutil.dumps(doc)))
     return all_docs
 
 
