@@ -108,6 +108,10 @@ def bef_user(usern1, usern2):
 
 
 def req_user(usern1, usern2):
+    """
+    sends incoming and outgoing friend requests from one user
+    to another
+    """
     update_user(usern2, {"$push": {"incomingRequests": usern1}})
     update_user(usern1, {"$push": {"outgoingRequests": usern2}})
 
