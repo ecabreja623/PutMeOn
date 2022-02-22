@@ -28,28 +28,28 @@ class EndpointTestCase(TestCase):
 
     def test_list_playlists1(self):
         """
-        Post-condition 1: return is a dictionary.
+        Post-condition 1: return is a list.
         """
         lp = ep.ListPlaylists(Resource)
         ret = lp.get()
-        self.assertIsInstance(ret, dict)
+        self.assertIsInstance(ret, list)
 
     def test_list_playlists2(self):
         """
-        Post-condition 2: keys to the dict are strings
+        Post-condition 2: all playlists have names
         """
         lp = ep.ListPlaylists(Resource)
         ret = lp.get()
-        for key in ret:
-            self.assertIsInstance(key, str)
+        for pl in ret:
+            self.assertIsInstance(pl['playlistName'], str)
 
     def test_list_playlists3(self):
         """
-        Post-condition 3: the values in the dict are themselves dicts
+        Post-condition 3: the values in the list are dicts
         """
         lp = ep.ListPlaylists(Resource)
         ret = lp.get()
-        for val in ret.values():
+        for val in ret:
             self.assertIsInstance(val, dict)
 
     def test_create_playlist1(self):
@@ -59,7 +59,7 @@ class EndpointTestCase(TestCase):
         cu = ep.CreatePlaylist(Resource)
         new_playlist = new_entity_name("playlist")
         ret = cu.post(new_playlist)
-        playlists = dbp.get_playlists()
+        playlists = dbp.get_playlists_dict()
         self.assertIn(new_playlist, playlists)
     
     def test_create_playlist2(self):

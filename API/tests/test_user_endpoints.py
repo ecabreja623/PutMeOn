@@ -46,28 +46,28 @@ class EndpointTestCase(TestCase):
 
     def test_list_users1(self):
         """
-        Post-condition 1: return is a dictionary.
+        Post-condition 1: return is a list.
         """
         lu = ep.ListUsers(Resource)
         ret = lu.get()
-        self.assertIsInstance(ret, dict)
+        self.assertIsInstance(ret, list)
 
     def test_list_users2(self):
         """
-        Post-condition 2: keys to the dict are strings
+        Post-condition 2: users have usernames
         """
         lu = ep.ListUsers(Resource)
         ret = lu.get()
-        for key in ret:
-            self.assertIsInstance(key, str)
+        for obj in ret:
+            self.assertIsInstance(obj["userName"], str)
 
     def test_list_users3(self):
         """
-        Post-condition 3: the values in the dict are themselves dicts
+        Post-condition 3: the values in the list are themselves dicts
         """
         lu = ep.ListUsers(Resource)
         ret = lu.get()
-        for val in ret.values():
+        for val in ret:
             self.assertIsInstance(val, dict)
 
     def test_create_user1(self):
@@ -77,7 +77,7 @@ class EndpointTestCase(TestCase):
         cu = ep.CreateUser(Resource)
         new_user = new_entity_name("user")
         ret = cu.post(new_user)
-        users = dbu.get_users()
+        users = dbu.get_users_dict()
         self.assertIn(new_user, users)
     
     def test_create_user2(self):

@@ -30,6 +30,13 @@ class DBTestCase(TestCase):
         Can we fetch user db?
         """
         users = dbu.get_users()
+        self.assertIsInstance(users, list)
+
+    def test_get_users_dict(self):
+        """
+        Can we fetch user db as a dict?
+        """
+        users = dbu.get_users_dict()
         self.assertIsInstance(users, dict)
 
     def test_get_user(self):

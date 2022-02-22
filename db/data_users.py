@@ -26,9 +26,16 @@ DUPLICATE = 2
 
 def get_users():
     """
-    returns all users
+    returns all users as a list
     """
     return dbc.fetch_all(USERS, USERNAME)
+
+
+def get_users_dict():
+    """
+    returns all users as a dict
+    """
+    return dbc.fetch_all_dict(USERS, USERNAME)
 
 
 def user_exists(username):

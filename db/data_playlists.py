@@ -29,6 +29,13 @@ def get_playlists():
     return dbc.fetch_all(PLAYLISTS, PLNAME)
 
 
+def get_playlists_dict():
+    """
+    returns all playlists in dictionary form
+    """
+    return dbc.fetch_all_dict(PLAYLISTS, PLNAME)
+
+
 def playlist_exists(playlist_name):
     """
     return true/false whether or not playlist exists

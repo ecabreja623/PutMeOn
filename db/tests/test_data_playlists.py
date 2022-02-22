@@ -24,6 +24,13 @@ class DBTestCase(TestCase):
         Can we fetch playlist db?
         """
         playlists = dbp.get_playlists()
+        self.assertIsInstance(playlists, list)
+
+    def test_get_playlists_dict(self):
+        """
+        Can we fetch playlist db as a dict?
+        """
+        playlists = dbp.get_playlists_dict()
         self.assertIsInstance(playlists, dict)
 
     def test_get_playlist(self):

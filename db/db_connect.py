@@ -60,7 +60,17 @@ def del_many(collect_nm, filters={}):
 
 def fetch_all(collect_nm, key_nm):
     """
-    fetch all records for a certain collection
+    fetch all records for a certain collection as a list
+    """
+    all_docs = []
+    for doc in client[DB_NM][collect_nm].find():
+        all_docs.append(bsutil.dumps(doc))
+    return all_docs
+
+
+def fetch_all_dict(collect_nm, key_nm):
+    """
+    fetch all records for a certain collection as a dictionary
     """
     all_docs = {}
     for doc in client[DB_NM][collect_nm].find():
