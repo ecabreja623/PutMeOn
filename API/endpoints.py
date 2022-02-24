@@ -146,15 +146,15 @@ class RequestUser(Resource):
                 raise(wz.NotAcceptable("Users are already friends"))
             elif usern1 in user2['outgoingRequests'] or \
                     usern2 in user1['incomingRequests']:
-                raise(wz.NotAcceptable("User2 already sent\
-                     user1 a friend request"))
+                raise(wz.NotAcceptable(f"{usern2} already sent\
+                     {usern1} a friend request"))
             elif usern2 in user1['outgoingRequests'] or \
                     usern1 in user2['incomingRequests']:
-                raise(wz.NotAcceptable("User1 already sent user2 \
+                raise(wz.NotAcceptable(f"{usern1} already sent {usern2} \
                     a friend request"))
             else:
                 dbu.req_user(usern1, usern2)
-                return "User1 sent user2 a friend request"
+                return f"{usern1} sent {usern2} a friend request"
         else:
             raise(wz.NotAcceptable("User cannot send themself \
                 a friend request"))
@@ -182,7 +182,7 @@ class BefriendUser(Resource):
             elif usern1 in user2['outgoingRequests'] and \
                     usern2 in user1['incomingRequests']:
                 dbu.bef_user(usern1, usern2)
-                return "Users added eachother as friends"
+                return f"{usern1} and {usern2} are now friends"
             else:
                 return(wz.NotAcceptable("Neither user has\
                      sent a friend request"))
@@ -207,7 +207,7 @@ class UnfriendUser(Resource):
             raise(wz.NotFound("At least one user not found"))
         elif usern1 in user2["friends"] or usern2 in user1["friends"]:
             dbu.unf_user(usern1, usern2)
-            return "Users removed eachother as friends"
+            return f"{usern1} and {usern2} are no longer friends"
         else:
             raise(wz.NotAcceptable("Users are not friends"))
 
@@ -227,12 +227,13 @@ class LikePlaylist(Resource):
         user = dbu.get_user(username)
         playlist = dbp.get_playlist(playlist_name)
         if user == dbu.NOT_FOUND:
-            raise(wz.NotFound("User not found"))
+            raise(wz.NotFound(f"User {username} not found"))
         elif playlist == dbp.NOT_FOUND:
-            raise(wz.NotFound("Playlist not found"))
+            raise(wz.NotFound(f"Playlist {playlist_name} not found"))
         elif playlist_name in user['likedPlaylists'] or \
                 username in playlist['likes']:
-            raise(wz.NotAcceptable("User has already liked this playlist"))
+            raise(wz.NotAcceptable(f"{username} has already\
+             liked {playlist_name}"))
         else:
             dbu.like_playlist(username, playlist_name)
             return f"{username} added {playlist_name} to their playlists"
@@ -253,12 +254,12 @@ class UnlikePlaylist(Resource):
         user = dbu.get_user(username)
         playlist = dbp.get_playlist(playlist_name)
         if user == dbu.NOT_FOUND:
-            raise(wz.NotFound("User not found"))
+            raise(wz.NotFound(f"User {username} not found"))
         elif playlist == dbp.NOT_FOUND:
-            raise(wz.NotFound("Playlist not found"))
+            raise(wz.NotFound(f"Playlist {playlist_name} not found"))
         elif playlist_name not in user["likedPlaylists"] or \
                 username not in playlist['likes']:
-            raise(wz.NotFound("Playlist not in user's likes"))
+            raise(wz.NotFound(f"{playlist_name} not in {username}'s likes"))
         else:
             dbu.unlike_playlist(username, playlist_name)
             return f"{username} removed {playlist_name} from their playlists"
