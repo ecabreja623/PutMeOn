@@ -297,6 +297,17 @@ class EndpointTestCase(TestCase):
         new2 = new_entity_name("user")
         uf = ep.UnfriendUser(Resource)
         self.assertRaises(wz.NotFound, uf.post, new1, new2)
+
+     def decline_friend_request(self):
+        """
+        Post-condition 1: friend request will be received and can be declined or accepted
+        """
+        new1 = new_entity_name("user")
+        dbu.add_user(new1)
+        new2 = new_entity_name("user")
+        dbu.add_user(new2)
+        uf = ep.DecRequest(Resource)
+        self.assertRaises(wz.NotAcceptable, uf.post, new1, new2)
         
     def test_like_playlist1(self):
         """
