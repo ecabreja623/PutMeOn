@@ -298,7 +298,7 @@ class EndpointTestCase(TestCase):
         uf = ep.UnfriendUser(Resource)
         self.assertRaises(wz.NotFound, uf.post, new1, new2)
 
-     def decline_friend_request(self):
+    def decline_friend_request(self):
         """
         Post-condition 1: friend request will be received and can be declined or accepted
         """
