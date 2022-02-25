@@ -33,7 +33,11 @@
 - Users can search for their friend using the '/users/search' endpoint 
     - user must pass their friend's username 
 - Users can search for a playlist using the '/playlists/search' endpoint
+- Users can send eachother friend requests using '/users/req_friend' endpoint
+    - Each user must not have any pending friend requests from the other
+    - Both users cannot already be friends
 - Users can add or remove one another as friends using the '/users/add_friend' and 'users/remove_friend' endpoints
+    - A user can only add another user if that user has first sent them a friend request.
     - Both users must be distinct and already exist
     - Users cannot be friends prior to adding one another
     - Users must be friends prior to removing one another
