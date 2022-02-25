@@ -109,11 +109,20 @@ def bef_user(usern1, usern2):
 
 def req_user(usern1, usern2):
     """
-    sends incoming and outgoing friend requests from one user
-    to another
+    adds usern1 to usern2's incoming requests
+    adds usern2 to usern1's outgoing requests
     """
     update_user(usern2, {"$push": {"incomingRequests": usern1}})
     update_user(usern1, {"$push": {"outgoingRequests": usern2}})
+
+
+def dec_req(usern1, usern2):
+    """
+    removes usern2 from usern1's incoming requests
+    removes usern1 from usern2's outgoing requests
+    """
+    update_user(usern1, {"$pull": {"incomingRequests": usern2}})
+    update_user(usern2, {"$pull": {"outgoingRequests": usern1}})
 
 
 def unf_user(usern1, usern2):

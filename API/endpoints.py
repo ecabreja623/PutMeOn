@@ -160,6 +160,34 @@ class RequestUser(Resource):
                 a friend request"))
 
 
+@api.route('/users/<usern1>/dec_request/<usern2>')
+class DecRequest(Resource):
+    """
+    this class supports one user removing another from their friend requests
+    """
+    @api.response(HTTPStatus.OK, 'Success')
+    @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
+    @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
+    def post(self, usern1, usern2):
+        """
+        This method adds two users to each others friend lists
+        """
+        if usern1 != usern2:
+            user1, user2 = dbu.get_user(usern1), dbu.get_user(usern2)
+            if user1 == dbu.NOT_FOUND or user2 == dbu.NOT_FOUND:
+                raise(wz.NotFound("At least one user not found"))
+            if usern1 in user2['outgoingRequests'] and \
+                    usern2 in user1['incomingRequests']:
+                dbu.decreq(usern1, usern2)
+                return f"{usern1} removed {usern2} from their friend requests"
+            else:
+                raise(wz.NotAcceptable(f"{usern2} has not sent \
+                    {usern1} a friend request!"))
+        else:
+            raise(wz.NotAcceptable("User cannot send themself \
+                a friend request"))
+
+
 @api.route('/users/<usern1>/add_friend/<usern2>')
 class BefriendUser(Resource):
     """
