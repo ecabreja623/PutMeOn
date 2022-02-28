@@ -64,7 +64,7 @@ class ListUsers(Resource):
         return users
 
 
-@api.route('/users/create/<username>')
+@api.route('/users/create/<username>_<password>')
 class CreateUser(Resource):
     """
     This class supports adding a user to the database.
@@ -72,11 +72,11 @@ class CreateUser(Resource):
     @api.response(HTTPStatus.OK, 'Success')
     @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
     @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
-    def post(self, username):
+    def post(self, username, password):
         """
         This method adds a user to the database
         """
-        ret = dbu.add_user(username)
+        ret = dbu.add_user(username, password)
         if ret == dbu.DUPLICATE:
             raise (wz.NotAcceptable("User already exists."))
         return f"{username} added."

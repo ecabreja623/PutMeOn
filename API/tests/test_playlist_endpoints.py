@@ -12,6 +12,7 @@ import db.data_playlists as dbp
 import db.data_users as dbu
 
 HUGE_NUM = 1000000000
+FAKE_PASSWORD = "FakePassword"
 
 def new_entity_name(entity_type):
     int_name = random.randint(0,HUGE_NUM)
@@ -56,9 +57,9 @@ class EndpointTestCase(TestCase):
         """
         Post-condition 1: create playlist and check if in db
         """
-        cu = ep.CreatePlaylist(Resource)
+        cp = ep.CreatePlaylist(Resource)
         new_playlist = new_entity_name("playlist")
-        ret = cu.post(new_playlist)
+        ret = cp.post(new_playlist)
         playlists = dbp.get_playlists_dict()
         self.assertIn(new_playlist, playlists)
     
@@ -66,10 +67,10 @@ class EndpointTestCase(TestCase):
         """
         Post-condition 2: create duplicates and make sure only one appears
         """
-        cu = ep.CreatePlaylist(Resource)
+        cp = ep.CreatePlaylist(Resource)
         new_playlist = new_entity_name("playlist")
-        cu.post(new_playlist)
-        self.assertRaises(wz.NotAcceptable, cu.post, (new_playlist))
+        cp.post(new_playlist)
+        self.assertRaises(wz.NotAcceptable, cp.post, (new_playlist))
 
     def test_search_playlist1(self):
         """
@@ -77,8 +78,8 @@ class EndpointTestCase(TestCase):
         """
         newplaylist = new_entity_name("playlist")
         dbp.add_playlist(newplaylist)
-        su = ep.SearchPlaylist(Resource)
-        ret = su.get(newplaylist)
+        sp = ep.SearchPlaylist(Resource)
+        ret = sp.get(newplaylist)
         self.assertEqual(newplaylist, ret[dbp.PLNAME])
 
     def test_search_playlist2(self):
@@ -86,8 +87,8 @@ class EndpointTestCase(TestCase):
         Post-condition 2: searching for a playlist that does not exist returns an error
         """    
         newplaylist = new_entity_name("playlist")
-        su = ep.SearchPlaylist(Resource)
-        self.assertRaises(wz.NotFound, su.get, newplaylist)
+        sp = ep.SearchPlaylist(Resource)
+        self.assertRaises(wz.NotFound, sp.get, newplaylist)
 
     def test_delete_playlist1(self):
         """
@@ -95,8 +96,8 @@ class EndpointTestCase(TestCase):
         """
         new_playlist = new_entity_name("playlist")
         dbp.add_playlist(new_playlist)
-        du = ep.DeletePlaylist(Resource)
-        du.post(new_playlist)
+        dp = ep.DeletePlaylist(Resource)
+        dp.post(new_playlist)
         self.assertNotIn(new_playlist, dbp.get_playlists())
 
     def test_delete_playlist2(self):
@@ -104,8 +105,8 @@ class EndpointTestCase(TestCase):
         Post-condition 2: deleting a playlist that does not exist results in a wz.NotAcceptable error
         """
         new_playlist = new_entity_name("playlist")
-        du = ep.DeletePlaylist(Resource)
-        self.assertRaises(wz.NotFound, du.post, new_playlist)
+        dp = ep.DeletePlaylist(Resource)
+        self.assertRaises(wz.NotFound, dp.post, new_playlist)
 
     def test_delete_playlist3(self):
         """
@@ -114,7 +115,7 @@ class EndpointTestCase(TestCase):
         newuser = new_entity_name("user")
         newpl = new_entity_name("playlist")
         dbp.add_playlist(newpl)
-        dbu.add_user(newuser)
+        dbu.add_user(newuser, FAKE_PASSWORD)
         lp = ep.LikePlaylist(Resource)
         lp.post(newuser, newpl)
         dp = ep.DeletePlaylist(Resource)

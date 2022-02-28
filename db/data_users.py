@@ -13,6 +13,7 @@ USERS = "users"
 
 PLNAME = "playlistName"
 USERNAME = "userName"
+PASSWORD = "password"
 
 client = dbc.get_client()
 if client is None:
@@ -56,7 +57,7 @@ def get_user(username):
         return NOT_FOUND
 
 
-def add_user(username):
+def add_user(username, password):
     """
     adds a user, returns whether successful or not
     """
@@ -64,6 +65,7 @@ def add_user(username):
         return DUPLICATE
     else:
         dbc.insert_doc(USERS, {USERNAME: username,
+                               PASSWORD: password,
                                "outgoingRequests": [],
                                "incomingRequests": [],
                                "friends": [],

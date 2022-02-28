@@ -12,6 +12,7 @@ import db.data_playlists as dbp
 import db.data_users as dbu
 
 HUGE_NUM = 1000000000
+FAKE_PASSWORD = "FakePassword"
 
 def new_entity_name(entity_type):
     int_name = random.randint(0,HUGE_NUM)
@@ -19,7 +20,7 @@ def new_entity_name(entity_type):
 
 def new_entity(entity="U"):
     new = new_entity_name(entity)
-    dbu.add_user(new)
+    dbu.add_user(new, FAKE_PASSWORD)
     return new
 
 class EndpointTestCase(TestCase):
@@ -76,7 +77,7 @@ class EndpointTestCase(TestCase):
         """
         cu = ep.CreateUser(Resource)
         new_user = new_entity_name("user")
-        ret = cu.post(new_user)
+        ret = cu.post(new_user, FAKE_PASSWORD)
         users = dbu.get_users_dict()
         self.assertIn(new_user, users)
     
@@ -86,15 +87,15 @@ class EndpointTestCase(TestCase):
         """
         cu = ep.CreateUser(Resource)
         new_user = new_entity_name("user")
-        cu.post(new_user)
-        self.assertRaises(wz.NotAcceptable, cu.post, new_user)
+        cu.post(new_user, FAKE_PASSWORD)
+        self.assertRaises(wz.NotAcceptable, cu.post, new_user, FAKE_PASSWORD)
 
     def test_search_user1(self):
         """
         Post-condition 1: successfully search for a user that exists
         """
         newuser = new_entity_name("user")
-        dbu.add_user(newuser)
+        dbu.add_user(newuser, FAKE_PASSWORD)
         su = ep.SearchUser(Resource)
         ret = su.get(newuser)
         self.assertEqual(newuser, ret[dbu.USERNAME])
@@ -112,7 +113,7 @@ class EndpointTestCase(TestCase):
         Post-condition 1: we can create and delete a user
         """
         new_user = new_entity_name("user")
-        dbu.add_user(new_user)
+        dbu.add_user(new_user, FAKE_PASSWORD)
         du = ep.DeleteUser(Resource)
         du.post(new_user)
         self.assertNotIn(new_user, dbu.get_users())
@@ -130,9 +131,9 @@ class EndpointTestCase(TestCase):
         Post-condition 3: deleting a user results in friends being removed from its database and it being removed from a playlist's likes
         """
         newuser = new_entity_name("user")
-        dbu.add_user(newuser)
+        dbu.add_user(newuser, FAKE_PASSWORD)
         newfriend = new_entity_name("user")
-        dbu.add_user(newfriend)
+        dbu.add_user(newfriend, FAKE_PASSWORD)
         af = ep.BefriendUser(Resource)
         af.post(newuser, newfriend)
         newpl = new_entity_name("playlist")
@@ -151,9 +152,9 @@ class EndpointTestCase(TestCase):
         Post-condition 1: we can make two users friends
         """
         new1 = new_entity_name("user")
-        dbu.add_user(new1)
+        dbu.add_user(new1, FAKE_PASSWORD)
         new2 = new_entity_name("user")
-        dbu.add_user(new2)
+        dbu.add_user(new2, FAKE_PASSWORD)
         dbu.req_user(new2, new1)
         af = ep.BefriendUser(Resource)
         af.post(new1, new2)
@@ -167,7 +168,7 @@ class EndpointTestCase(TestCase):
         Post-condition 2: attempting to add a friend that is a non-existent user fails
         """
         new1 = new_entity_name("user")
-        dbu.add_user(new1)
+        dbu.add_user(new1, FAKE_PASSWORD)
         new2 = new_entity_name("user")
         af = ep.BefriendUser(Resource)
         self.assertRaises(wz.NotFound, af.post, new1, new2)
@@ -177,9 +178,9 @@ class EndpointTestCase(TestCase):
         Post-condition 3: we cannot make two users friends if they are already friends
         """
         new1 = new_entity_name("user")
-        dbu.add_user(new1)
+        dbu.add_user(new1, FAKE_PASSWORD)
         new2 = new_entity_name("user")
-        dbu.add_user(new2)
+        dbu.add_user(new2, FAKE_PASSWORD)
         dbu.req_user(new2, new1)
         af = ep.BefriendUser(Resource)
         dbu.req_user(new2, new1)
@@ -191,7 +192,7 @@ class EndpointTestCase(TestCase):
         Post-condition 4: A user cannot add themself as a friend
         """
         newuser = new_entity_name("user")
-        dbu.add_user(newuser)
+        dbu.add_user(newuser, FAKE_PASSWORD)
         af = ep.BefriendUser(Resource)
         self.assertRaises(wz.NotAcceptable, af.post, newuser, newuser)
 
@@ -264,9 +265,9 @@ class EndpointTestCase(TestCase):
         Post-condition 1: two friends can remove one another
         """
         new1 = new_entity_name("user")
-        dbu.add_user(new1)
+        dbu.add_user(new1, FAKE_PASSWORD)
         new2 = new_entity_name("user")
-        dbu.add_user(new2)
+        dbu.add_user(new2, FAKE_PASSWORD)
         af = ep.BefriendUser(Resource)
         dbu.req_user(new2, new1)
         af.post(new1, new2)
@@ -282,9 +283,9 @@ class EndpointTestCase(TestCase):
         Post-condition 2: two non friends cannot remove one another
         """
         new1 = new_entity_name("user")
-        dbu.add_user(new1)
+        dbu.add_user(new1, FAKE_PASSWORD)
         new2 = new_entity_name("user")
-        dbu.add_user(new2)
+        dbu.add_user(new2, FAKE_PASSWORD)
         uf = ep.UnfriendUser(Resource)
         self.assertRaises(wz.NotAcceptable, uf.post, new1, new2)
     
@@ -293,7 +294,7 @@ class EndpointTestCase(TestCase):
         Post-condition 3: passing a nonexistent user will fail
         """
         new1 = new_entity_name("user")
-        dbu.add_user(new1)
+        dbu.add_user(new1, FAKE_PASSWORD)
         new2 = new_entity_name("user")
         uf = ep.UnfriendUser(Resource)
         self.assertRaises(wz.NotFound, uf.post, new1, new2)
@@ -324,7 +325,7 @@ class EndpointTestCase(TestCase):
         newuser = new_entity_name("user")
         newpl = new_entity_name("playlist")
         dbp.add_playlist(newpl)
-        dbu.add_user(newuser)
+        dbu.add_user(newuser, FAKE_PASSWORD)
         lp.post(newuser, newpl)
         u = dbu.get_user(newuser)
         pl = dbp.get_playlist(newpl)
@@ -339,7 +340,7 @@ class EndpointTestCase(TestCase):
         newuser = new_entity_name("user")
         newpl = new_entity_name("playlist")
         dbp.add_playlist(newpl)
-        dbu.add_user(newuser)
+        dbu.add_user(newuser, FAKE_PASSWORD)
         lp.post(newuser, newpl)
         self.assertRaises(wz.NotAcceptable, lp.post, newuser, newpl)
 
@@ -360,7 +361,7 @@ class EndpointTestCase(TestCase):
         lp = ep.LikePlaylist(Resource)
         newuser = new_entity_name("user")
         newpl = new_entity_name("playlist")
-        dbu.add_user(newuser)
+        dbu.add_user(newuser, FAKE_PASSWORD)
         self.assertRaises(wz.NotFound, lp.post, newuser, newpl)
 
     def test_unlike_playlist1(self):
@@ -372,7 +373,7 @@ class EndpointTestCase(TestCase):
         newuser = new_entity_name("user")
         newpl = new_entity_name("playlist")
         dbp.add_playlist(newpl)
-        dbu.add_user(newuser)
+        dbu.add_user(newuser, FAKE_PASSWORD)
         lp.post(newuser, newpl)
         up.post(newuser, newpl)
         u = dbu.get_user(newuser)
@@ -388,7 +389,7 @@ class EndpointTestCase(TestCase):
         newuser = new_entity_name("user")
         newpl = new_entity_name("playlist")
         dbp.add_playlist(newpl)
-        dbu.add_user(newuser)
+        dbu.add_user(newuser, FAKE_PASSWORD)
         self.assertRaises(wz.NotFound, up.post, newuser, newpl)
 
     def test_unlike_playlist3(self):
@@ -409,5 +410,5 @@ class EndpointTestCase(TestCase):
         up = ep.UnlikePlaylist(Resource)
         newuser = new_entity_name("user")
         newpl = new_entity_name("playlist")
-        dbu.add_user(newuser)
+        dbu.add_user(newuser, FAKE_PASSWORD)
         self.assertRaises(wz.NotFound, up.post, newuser, newpl)

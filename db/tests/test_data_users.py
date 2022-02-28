@@ -8,6 +8,7 @@ import data_users as dbu
 import data_playlists as dbp
 
 FAKE_USER = "Fake user"
+FAKE_PASSWORD = "FakePassword"
 FAKE_PLAYLIST = "Fake playlist"
 
 class DBTestCase(TestCase):
@@ -21,7 +22,7 @@ class DBTestCase(TestCase):
         """
         Can we write to the user db?
         """
-        dbu.add_user(FAKE_USER)
+        dbu.add_user(FAKE_USER, FAKE_PASSWORD)
         user = dbu.get_user(FAKE_USER)
         self.assertEqual(user[dbu.USERNAME],FAKE_USER)
 
@@ -43,7 +44,7 @@ class DBTestCase(TestCase):
         """
         Can we fetch a user from the user db?
         """
-        dbu.add_user(FAKE_USER)
+        dbu.add_user(FAKE_USER, FAKE_PASSWORD)
         user = dbu.get_user(FAKE_USER)
         self.assertIsInstance(user, dict)
 
@@ -51,7 +52,7 @@ class DBTestCase(TestCase):
         """
         Can we delete a user from the user db?
         """
-        dbu.add_user(FAKE_USER)
+        dbu.add_user(FAKE_USER, FAKE_PASSWORD)
         ret = dbu.del_user(FAKE_USER)
         self.assertEqual(ret, dbu.OK)
         self.assertFalse(FAKE_USER in dbu.get_users())
@@ -60,7 +61,7 @@ class DBTestCase(TestCase):
         """
         Can we write to the user db?
         """
-        dbu.add_user(FAKE_USER)
+        dbu.add_user(FAKE_USER, FAKE_PASSWORD)
         user = dbu.get_user(FAKE_USER)
         self.assertEqual(user[dbu.USERNAME],FAKE_USER)
     
@@ -68,7 +69,7 @@ class DBTestCase(TestCase):
         """
         Post-condition 1: returns true when a user exists, false otherwise
         """
-        dbu.add_user(FAKE_USER)
+        dbu.add_user(FAKE_USER, FAKE_PASSWORD)
         self.assertTrue(dbu.user_exists(FAKE_USER))
         self.assertFalse(dbu.user_exists("FOOBAR JONES"))
 
@@ -76,7 +77,7 @@ class DBTestCase(TestCase):
         """
         Can we update a user?
         """
-        dbu.add_user(FAKE_USER)
+        dbu.add_user(FAKE_USER, FAKE_PASSWORD)
         dbu.update_user(FAKE_USER, {"$push": {"friends":"fake friend"}})
         u = dbu.get_user(FAKE_USER)
         self.assertIn("fake friend", u["friends"])
@@ -90,8 +91,8 @@ class DBTestCase(TestCase):
         """
         new1 = "new1"
         new2 = "new2"
-        dbu.add_user(new1)
-        dbu.add_user(new2)
+        dbu.add_user(new1, FAKE_PASSWORD)
+        dbu.add_user(new2, FAKE_PASSWORD)
         dbu.bef_user(new1, new2)
         u1 = dbu.get_user(new1)
         u2 = dbu.get_user(new2)
@@ -104,8 +105,8 @@ class DBTestCase(TestCase):
         """        
         new1 = "new1"
         new2 = "new2"
-        dbu.add_user(new1)
-        dbu.add_user(new2)
+        dbu.add_user(new1, FAKE_PASSWORD)
+        dbu.add_user(new2, FAKE_PASSWORD)
         dbu.bef_user(new1, new2)
         dbu.unf_user(new1, new2)
         u1 = dbu.get_user(new1)
@@ -120,7 +121,7 @@ class DBTestCase(TestCase):
         newpl = "playlist"
         newuser = "user"
         dbp.add_playlist(newpl)
-        dbu.add_user(newuser)
+        dbu.add_user(newuser, FAKE_PASSWORD)
         dbu.like_playlist(newuser, newpl)
         u = dbu.get_user(newuser)
         pl = dbp.get_playlist(newpl)
@@ -134,7 +135,7 @@ class DBTestCase(TestCase):
         newpl = "playlist"
         newuser = "user"
         dbp.add_playlist(newpl)
-        dbu.add_user(newuser)
+        dbu.add_user(newuser, FAKE_PASSWORD)
         dbu.like_playlist(newuser, newpl)
         dbu.unlike_playlist(newuser, newpl)
         u = dbu.get_user(newuser)
@@ -147,6 +148,6 @@ class DBTestCase(TestCase):
         we can empty the user collection
         """
         for i in range(10):
-            dbu.add_user("USER")
+            dbu.add_user("USER", FAKE_PASSWORD)
         dbu.empty()
         self.assertEqual(len(dbu.get_users()), 0)
