@@ -299,23 +299,30 @@ class EndpointTestCase(TestCase):
         uf = ep.UnfriendUser(Resource)
         self.assertRaises(wz.NotFound, uf.post, new1, new2)
 
-    def decline_friend_request1(self):
+
+    def test_decline_friend_request1(self):
         """
-        Post-condition 1: friend request will be received and can be declined or accepted
+        Post-condition 1: A user can decline a request that has been sent
+        """
+        new1 = new_entity()
+        new2 = new_entity()
+        dbu.req_user(new1, new2)
+        df = ep.DecRequest(Resource)
+        df.post(new2, new1)
+        user1, user2 = dbu.get_user(new1), dbu.get_user(new2)
+        self.assertNotIn(new2, user1["outgoingRequests"])
+        self.assertNotIn(new1, user2["incomingRequests"])
+
+
+    def test_decline_friend_request2(self):
+        """
+        Post-condition 2: A user cannot decline a request if neither exist
         """
         new1 = new_entity_name("user")
-        dbu.dec_req(new1)
-        uf = ep.DecRequest(Resource)
-        self.assertRaises(wz.NotAcceptable, uf.post, new1, new2)
+        new2 = new_entity_name("user")
+        df = ep.DecRequest(Resource)
+        self.assertRaises(wz.NotFound, df.post, new1, new2)
 
-    # def decline_friend_request2(self):
-    #     """
-    #     Post-condition 2: Friend Request sent, 
-    #     """
-    #     new1 = new_entity_name("user")
-    #     dbu.dec_req(new1)
-    #     uf = ep.DecRequest(Resource)
-    #     self.assertRaises(wz.NotAcceptable, uf.post, new1, new2)
         
     def test_like_playlist1(self):
         """

@@ -178,7 +178,7 @@ class DecRequest(Resource):
                 raise(wz.NotFound("At least one user not found"))
             if usern1 in user2['outgoingRequests'] and \
                     usern2 in user1['incomingRequests']:
-                dbu.decreq(usern1, usern2)
+                dbu.dec_req(usern1, usern2)
                 return f"{usern1} removed {usern2} from their friend requests"
             else:
                 raise(wz.NotAcceptable(f"{usern2} has not sent \

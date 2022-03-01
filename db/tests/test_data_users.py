@@ -114,6 +114,21 @@ class DBTestCase(TestCase):
         self.assertNotIn(new1, u2["friends"])
         self.assertNotIn(new2, u1["friends"])
     
+    def decf_user(self):
+        """
+        db can remove users from their friend requests
+        """
+        new1 = "new1"
+        new2 = "new2"
+        dbu.add_user(new1, FAKE_PASSWORD)
+        dbu.add_user(new2, FAKE_PASSWORD)
+        dbu.req_user(new1, new2)
+        dbu.dec_req(new2, new1)
+        user1, user2 = dbu.get_user(new1), dbu.get_user(new2)
+        self.assertNotIn(user1["outgoingRequests"], new2)
+        self.assertNotIn(user2["incomingRequests"], new1)
+
+
     def test_like_playlist(self):
         """
         a user can like a playlist
