@@ -23,6 +23,7 @@ if client is None:
 OK = 0
 NOT_FOUND = 1
 DUPLICATE = 2
+NOT_ACCEPTABLE = 3
 
 
 def get_users():
@@ -72,6 +73,18 @@ def add_user(username, password):
                                "ownedPlaylists": [],
                                "likedPlaylists": [],
                                })
+        return OK
+
+
+def login(username, password):
+    """
+    checks if password matches user
+    """
+    if not user_exists(username):
+        return NOT_FOUND
+    if get_user(username)[PASSWORD] != password:
+        return NOT_ACCEPTABLE
+    else:
         return OK
 
 

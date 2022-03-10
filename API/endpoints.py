@@ -82,6 +82,26 @@ class CreateUser(Resource):
         return f"{username} added."
 
 
+@api.route('/users/login/<username>_<password>')
+class LoginUser(Resource):
+    """
+    This class supports a user getting authorization from the API
+    given the correct username and password
+    """
+    def get(self, username, password):
+        """
+        This method supports telling the frontend
+        if their authorization details are correct
+        """
+        ret = dbu.login(username, password)
+        if ret == dbu.NOT_FOUND:
+            raise (wz.NotFound("Username not found"))
+        elif ret == dbu.NOT_ACCEPTABLE:
+            raise (wz.NotAcceptable("Incorrect Password"))
+        elif ret == dbu.OK:
+            return username
+
+
 @api.route('/users/search/<username>')
 class SearchUser(Resource):
     """

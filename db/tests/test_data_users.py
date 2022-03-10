@@ -166,3 +166,17 @@ class DBTestCase(TestCase):
             dbu.add_user("USER", FAKE_PASSWORD)
         dbu.empty()
         self.assertEqual(len(dbu.get_users()), 0)
+
+    def test_login1(self):
+        """
+        a user can login
+        """
+        dbu.add_user(FAKE_USER, FAKE_PASSWORD)
+        self.assertEqual(dbu.login(FAKE_USER, FAKE_PASSWORD), dbu.OK)
+
+    def test_login2(self):
+        """
+        a user cannot login with incorrect credentials
+        """
+        dbu.add_user(FAKE_USER, FAKE_PASSWORD)
+        self.assertEqual(dbu.login(FAKE_USER, "1"), dbu.NOT_ACCEPTABLE)
