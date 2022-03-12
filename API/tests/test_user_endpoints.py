@@ -69,7 +69,13 @@ class EndpointTestCase(TestCase):
         lu = ep.ListUsers(Resource)
         ret = lu.get()
         for val in ret:
-            self.assertIsInstance(val, dict)
+        self.assertIsInstance(val, dict)
+
+    def test_list_users4(self):
+        lu = ep.ListUsers(Resource)
+        ret = lu.get()
+        for obj in ret:
+            self.assertIsInstance(obj["password"], str)
 
     def test_create_user1(self):
         """
