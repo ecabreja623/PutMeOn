@@ -1,8 +1,8 @@
 # Put Me On
 
-API currently hosted on https://put-me-on.herokuapp.com/
-Frontend repo at https://github.com/jdahhan/PutMeOn_FrontEnd
-frontend deployed to https://putmeon.netlify.app/
+API currently hosted on https://put-me-on.herokuapp.com/ \n
+Frontend repo at https://github.com/jdahhan/PutMeOn_FrontEnd \n
+frontend deployed to https://putmeon.netlify.app/ \n
 
 ## Requirements
 
