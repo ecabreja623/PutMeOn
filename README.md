@@ -1,5 +1,9 @@
 # Put Me On
 
+API currently hosted on https://put-me-on.herokuapp.com/
+Frontend repo at https://github.com/jdahhan/PutMeOn_FrontEnd
+frontend deployed to https://putmeon.netlify.app/
+
 ## Requirements
 
 - Create a profile page that displays their data
@@ -44,5 +48,3 @@
 - Users can like/unlike a playlist using the 'users/like_playlist' and 'users/unlike_playlist' endpoints
     - Playlist cannot already be liked if user is liking it
     - Playlist must already be liked if user is unliking it
-
-Presently trying to get Github Actions working.
