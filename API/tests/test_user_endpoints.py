@@ -69,9 +69,12 @@ class EndpointTestCase(TestCase):
         lu = ep.ListUsers(Resource)
         ret = lu.get()
         for val in ret:
-        self.assertIsInstance(val, dict)
+            self.assertIsInstance(val, dict)
 
     def test_list_users4(self):
+        """
+        Post-condition 4: the passwords are strings
+        """
         lu = ep.ListUsers(Resource)
         ret = lu.get()
         for obj in ret:
