@@ -97,7 +97,7 @@ class EndpointTestCase(TestCase):
         new_playlist = new_entity_name("playlist")
         dbp.add_playlist(new_playlist)
         dp = ep.DeletePlaylist(Resource)
-        dp.post(new_playlist)
+        dp.delete(new_playlist)
         self.assertNotIn(new_playlist, dbp.get_playlists())
 
     def test_delete_playlist2(self):
@@ -106,7 +106,7 @@ class EndpointTestCase(TestCase):
         """
         new_playlist = new_entity_name("playlist")
         dp = ep.DeletePlaylist(Resource)
-        self.assertRaises(wz.NotFound, dp.post, new_playlist)
+        self.assertRaises(wz.NotFound, dp.delete, new_playlist)
 
     def test_delete_playlist3(self):
         """
@@ -119,7 +119,7 @@ class EndpointTestCase(TestCase):
         lp = ep.LikePlaylist(Resource)
         lp.post(newuser, newpl)
         dp = ep.DeletePlaylist(Resource)
-        dp.post(newpl)
+        dp.delete(newpl)
         user = dbu.get_user(newuser)
         self.assertNotIn(newpl, user['likedPlaylists'])
 
