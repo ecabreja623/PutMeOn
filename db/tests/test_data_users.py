@@ -180,3 +180,41 @@ class DBTestCase(TestCase):
         """
         dbu.add_user(FAKE_USER, FAKE_PASSWORD)
         self.assertEqual(dbu.login(FAKE_USER, "1"), dbu.NOT_ACCEPTABLE)
+
+    def test_getfriends(self):
+        """
+        a user can get all its friends
+        """
+        ret = []
+        dbu.add_user(FAKE_USER, FAKE_PASSWORD)
+        for i in range(10):
+            dbu.add_user(FAKE_USER+str(i), FAKE_PASSWORD)
+            dbu.bef_user(FAKE_USER, FAKE_USER+str(i))
+            ret.append(dbu.get_user(FAKE_USER+str(i)))
+        self.assertEqual(dbu.get_friends(FAKE_USER), ret)
+
+"""
+THIS HAS TO BE REWORKED WHEN WE MAKE A USER CREATE PLAYLISTS
+    def test_getplaylists_created(self):
+        "
+        a user can get all the playlists it created
+        "
+        ret = []
+        dbu.add_user(FAKE_USER, FAKE_PASSWORD)
+        for i in range(10):
+            dbp.add_playlist(FAKE_PLAYLIST+str(i))
+            ret.append(dbp.get_playlist(FAKE_PLAYLIST+str(i)))
+        self.assertEqual(dbu.get_created_playlists(FAKE_USER), ret)
+
+    def test_getplaylists_liked(self):
+        "
+        a user can get all the playlists it created
+        "
+        ret = []
+        dbu.add_user(FAKE_USER, FAKE_PASSWORD)
+        for i in range(10):
+            dbp.add_playlist(FAKE_PLAYLIST+str(i))
+            ret.append(dbp.get_playlist(FAKE_PLAYLIST+str(i)))
+        self.assertEqual(dbu.get_created_playlists(FAKE_USER), ret)
+"""
+    

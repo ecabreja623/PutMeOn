@@ -428,3 +428,28 @@ class EndpointTestCase(TestCase):
         newpl = new_entity_name("playlist")
         dbu.add_user(newuser, FAKE_PASSWORD)
         self.assertRaises(wz.NotFound, up.post, newuser, newpl)
+
+    def test_login1(self):
+        """
+        Post-condition 1: a user can log into their account
+        """
+        user = new_entity()
+        li = ep.LoginUser(Resource)
+        assrt = li.get(user, FAKE_PASSWORD)
+        self.assertEqual(assrt, user)
+
+    def test_login2(self):
+        """
+        Post-condition 2: a user cannot log in with an incorrect password
+        """
+        user = new_entity()
+        li = ep.LoginUser(Resource)
+        self.assertRaises(wz.NotAcceptable, li.get(user, user))
+    
+    def test_login3(self):
+        """
+        Post-condition 3: a user cannot log in with a username that doesn't exist
+        """
+        user = new_entity_name('user')
+        li = ep.LoginUser(Resource)
+        self.assertRaises(wz.NotFound, li.get(user, FAKE_PASSWORD))
