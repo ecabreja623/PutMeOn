@@ -5,6 +5,7 @@ Gradually, we will fill in actual calls to our datastore.
 Only for user related database calls
 """
 
+from tkinter.messagebox import NO
 import db.db_connect as dbc
 import db.data_playlists as dbp
 
@@ -146,6 +147,55 @@ def unf_user(usern1, usern2):
     """
     update_user(usern2, {"$pull": {"friends": usern1}})
     update_user(usern1, {"$pull": {"friends": usern2}})
+
+
+def get_users_entries(username, param):
+    """
+    returns a complete list of all users in a user's list
+    """
+    if not user_exists(username):
+        return NOT_FOUND
+    else:
+        user = get_user(username)
+        ret = []
+        for friend in user[param]:
+            ret.append(get_user(friend))
+        return ret
+
+
+def get_friends(username):
+    """
+    returns a complete list of a user's friends
+    """
+    return get_users_entries(username, 'friends')
+
+
+def get_liked_playlists(username):
+    """
+    returns a complete list of a user's liked playlists
+    """
+    return get_users_playlists(username, 'likedPlaylists')
+
+
+def get_created_playlists(username):
+    """
+    returns a complete list of a user's created playlists
+    """
+    return get_users_playlists(username, 'createdPlaylists')
+
+
+def get_users_playlists(username, param):
+    """
+    returns a complete list of all the playlists that a user has interacted with in some way
+    """
+    if not user_exists(username):
+        return NOT_FOUND
+    else:
+        ret = []
+        user = get_user(username)
+        for playlist in user[param]:
+            ret.append(dbp.get_playlist(playlist))
+        return ret
 
 
 def like_playlist(username, playlist_name):
