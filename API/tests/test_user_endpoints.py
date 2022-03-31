@@ -444,7 +444,7 @@ class EndpointTestCase(TestCase):
         """
         user = new_entity()
         li = ep.LoginUser(Resource)
-        self.assertRaises(wz.NotAcceptable, li.get(user, user))
+        self.assertRaises(wz.NotAcceptable, li.get, user, user)
     
     def test_login3(self):
         """
@@ -452,4 +452,4 @@ class EndpointTestCase(TestCase):
         """
         user = new_entity_name('user')
         li = ep.LoginUser(Resource)
-        self.assertRaises(wz.NotFound, li.get(user, FAKE_PASSWORD))
+        self.assertRaises(wz.NotFound, li.get, user, FAKE_PASSWORD)

@@ -5,7 +5,6 @@ Gradually, we will fill in actual calls to our datastore.
 Only for user related database calls
 """
 
-from tkinter.messagebox import NO
 import db.db_connect as dbc
 import db.data_playlists as dbp
 
@@ -186,7 +185,8 @@ def get_created_playlists(username):
 
 def get_users_playlists(username, param):
     """
-    returns a complete list of all the playlists that a user has interacted with in some way
+    returns a complete list of all the playlists
+    that a user has interacted with in some way
     """
     if not user_exists(username):
         return NOT_FOUND
