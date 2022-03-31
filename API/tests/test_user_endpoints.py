@@ -71,6 +71,15 @@ class EndpointTestCase(TestCase):
         for val in ret:
             self.assertIsInstance(val, dict)
 
+    def test_list_users4(self):
+        """
+        Post-condition 4: the passwords are strings
+        """
+        lu = ep.ListUsers(Resource)
+        ret = lu.get()
+        for obj in ret:
+            self.assertIsInstance(obj["password"], str)
+
     def test_create_user1(self):
         """
         Post-condition 1: create user and check if in db
@@ -115,7 +124,7 @@ class EndpointTestCase(TestCase):
         new_user = new_entity_name("user")
         dbu.add_user(new_user, FAKE_PASSWORD)
         du = ep.DeleteUser(Resource)
-        du.post(new_user)
+        du.delete(new_user)
         self.assertNotIn(new_user, dbu.get_users())
 
     def test_delete_user2(self):
@@ -124,7 +133,7 @@ class EndpointTestCase(TestCase):
         """
         new_user = new_entity_name("user")
         du = ep.DeleteUser(Resource)
-        self.assertRaises(wz.NotFound, du.post, new_user)
+        self.assertRaises(wz.NotFound, du.delete, new_user)
 
     def test_delete_user3(self):
         """
@@ -141,7 +150,7 @@ class EndpointTestCase(TestCase):
         lp = ep.LikePlaylist(Resource)
         lp.post(newuser, newpl)
         du = ep.DeleteUser(Resource)
-        du.post(newuser)
+        du.delete(newuser)
         friend = dbu.get_user(newfriend)
         pl = dbp.get_playlist(newpl)
         self.assertNotIn(newuser, friend['friends'])

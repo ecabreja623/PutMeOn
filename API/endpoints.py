@@ -128,7 +128,7 @@ class DeleteUser(Resource):
     @api.response(HTTPStatus.OK, 'Success')
     @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
     @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
-    def post(self, username):
+    def delete(self, username):
         """
         This method deletes a user from the database
         """
@@ -379,7 +379,7 @@ class DeletePlaylist(Resource):
     @api.response(HTTPStatus.OK, 'Success')
     @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
     @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
-    def post(self, playlist_name):
+    def delete(self, playlist_name):
         """
         This method deletes a playlist from the database
         """
