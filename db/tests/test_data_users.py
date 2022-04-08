@@ -172,7 +172,8 @@ class DBTestCase(TestCase):
         a user can login
         """
         dbu.add_user(FAKE_USER, FAKE_PASSWORD)
-        self.assertEqual(dbu.login(FAKE_USER, FAKE_PASSWORD), dbu.OK)
+        check = dbu.login(FAKE_USER, FAKE_PASSWORD)
+        self.assertIsInstance(check, str)
 
     def test_login2(self):
         """
@@ -180,6 +181,24 @@ class DBTestCase(TestCase):
         """
         dbu.add_user(FAKE_USER, FAKE_PASSWORD)
         self.assertEqual(dbu.login(FAKE_USER, "1"), dbu.NOT_ACCEPTABLE)
+
+    def test_auth1(self):
+        """
+        a user can successfully be authorized for a task
+        """
+        dbu.add_user(FAKE_USER, FAKE_PASSWORD)
+        token = dbu.login(FAKE_USER, FAKE_PASSWORD)
+        ret = dbu.check_auth(FAKE_USER, token)
+        self.assertTrue(ret)
+
+    def test_auth2(self):
+        """
+        a user can be unauthorized for a task
+        """
+        dbu.add_user(FAKE_USER, FAKE_PASSWORD)
+        val = dbu.token.new()
+        ret = dbu.check_auth(FAKE_USER, val)
+        self.assertFalse(ret)
 
     def test_getfriends(self):
         """

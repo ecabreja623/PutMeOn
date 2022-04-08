@@ -7,6 +7,7 @@ Only for user related database calls
 
 import db.db_connect as dbc
 import db.data_playlists as dbp
+import db.usertoken as token
 
 PLAYLISTS = "playlists"
 USERS = "users"
@@ -72,20 +73,34 @@ def add_user(username, password):
                                "friends": [],
                                "ownedPlaylists": [],
                                "likedPlaylists": [],
+                               "token": token.blank(),
                                })
         return OK
 
 
 def login(username, password):
     """
-    checks if password matches user
+    checks if password matches user, gen token if it does
     """
     if not user_exists(username):
         return NOT_FOUND
     if get_user(username)[PASSWORD] != password:
         return NOT_ACCEPTABLE
     else:
-        return OK
+        newtoken = token.new()
+        update_user(username, {"$set": {"token": newtoken}})
+        return newtoken['id']
+
+
+def check_auth(username, val):
+    """
+    check if user is who they claim to be
+    """
+    valid = val == get_user(username)['token']['id']
+    if valid:
+        unexpired = token.check(get_user(username)['token'])
+        return valid and unexpired
+    return False
 
 
 def update_user(user_name, update):

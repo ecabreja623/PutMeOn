@@ -4,7 +4,7 @@ The endpoint called `endpoints` will return all available endpoints.
 """
 
 from http import HTTPStatus
-from flask import Flask
+from flask import Flask  # , request
 from flask_cors import CORS
 from flask_restx import Resource, Api
 import werkzeug.exceptions as wz
@@ -93,13 +93,13 @@ class LoginUser(Resource):
         This method supports telling the frontend
         if their authorization details are correct
         """
-        ret = dbu.login(username, password)
-        if ret == dbu.NOT_FOUND:
+        token = dbu.login(username, password)
+        if token == dbu.NOT_FOUND:
             raise (wz.NotFound("Username not found"))
-        elif ret == dbu.NOT_ACCEPTABLE:
+        elif token == dbu.NOT_ACCEPTABLE:
             raise (wz.NotAcceptable("Incorrect Password"))
-        elif ret == dbu.OK:
-            return username
+        else:
+            return token
 
 
 @api.route('/users/search/<username>')
@@ -157,6 +157,10 @@ class RequestUser(Resource):
     def post(self, usern1, usern2):
         """
         This method adds two users to each others friend lists
+        """
+        """
+        want to add:
+        if check_auth(usern1, request.get_json()['token']):
         """
         if usern1 != usern2:
             user1, user2 = dbu.get_user(usern1), dbu.get_user(usern2)

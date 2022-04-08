@@ -1,5 +1,5 @@
 """
-This file holds the tests for data.py
+This file holds the tests for data_playlists.py
 """
 
 from unittest import TestCase, skip

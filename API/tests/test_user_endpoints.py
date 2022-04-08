@@ -436,7 +436,7 @@ class EndpointTestCase(TestCase):
         user = new_entity()
         li = ep.LoginUser(Resource)
         assrt = li.get(user, FAKE_PASSWORD)
-        self.assertEqual(assrt, user)
+        self.assertIsInstance(assrt, str)
 
     def test_login2(self):
         """
