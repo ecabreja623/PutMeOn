@@ -31,14 +31,20 @@ def get_users():
     """
     returns all users as a list
     """
-    return dbc.fetch_all(USERS, USERNAME)
+    ret = dbc.fetch_all(USERS, USERNAME)
+    for user in ret:
+        user.pop(PASSWORD)
+    return ret
 
 
 def get_users_dict():
     """
     returns all users as a dict
     """
-    return dbc.fetch_all_dict(USERS, USERNAME)
+    ret = dbc.fetch_all_dict(USERS, USERNAME)
+    for user in ret:
+        ret[user].pop(PASSWORD)
+    return ret
 
 
 def user_exists(username):
@@ -54,7 +60,9 @@ def get_user(username):
     return a user given a username, else NOT_FOUND
     """
     if user_exists(username):
-        return dbc.fetch_one(USERS, filters={USERNAME: username})
+        ret = dbc.fetch_one(USERS, filters={USERNAME: username})
+        ret.pop(PASSWORD)
+        return ret
     else:
         return NOT_FOUND
 
@@ -67,7 +75,7 @@ def add_user(username, password):
         return DUPLICATE
     else:
         dbc.insert_doc(USERS, {USERNAME: username,
-                               PASSWORD: password,
+                               PASSWORD: hash(password),
                                "outgoingRequests": [],
                                "incomingRequests": [],
                                "friends": [],
@@ -78,13 +86,21 @@ def add_user(username, password):
         return OK
 
 
+def check_password(username, password):
+    """
+    checks a user's password without potentially exposing it to an endpoint
+    """
+    user = dbc.fetch_one(USERS, filters={USERNAME: username})
+    return hash(password) == user[PASSWORD]
+
+
 def login(username, password):
     """
     checks if password matches user, gen token if it does
     """
     if not user_exists(username):
         return NOT_FOUND
-    if get_user(username)[PASSWORD] != password:
+    if not check_password(username, password):
         return NOT_ACCEPTABLE
     else:
         newtoken = token.new()
@@ -173,7 +189,8 @@ def get_users_entries(username, param):
         user = get_user(username)
         ret = []
         for friend in user[param]:
-            ret.append(get_user(friend))
+            currfriend = get_user(friend)
+            ret.append(currfriend)
         return ret
 
 
