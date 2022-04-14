@@ -18,6 +18,10 @@ def new_entity_name(entity_type):
     int_name = random.randint(0,HUGE_NUM)
     return f"new {entity_type}" + str(int_name)
 
+def new_user():
+    new = new_entity_name("USER")
+    dbu.add_user(new, FAKE_PASSWORD)
+    return new
 
 class EndpointTestCase(TestCase):
     def setUp(self):
@@ -57,9 +61,10 @@ class EndpointTestCase(TestCase):
         """
         Post-condition 1: create playlist and check if in db
         """
+        user = new_user()
         cp = ep.CreatePlaylist(Resource)
         new_playlist = new_entity_name("playlist")
-        ret = cp.post(new_playlist)
+        cp.post(user, new_playlist)
         playlists = dbp.get_playlists_dict()
         self.assertIn(new_playlist, playlists)
     
@@ -68,10 +73,10 @@ class EndpointTestCase(TestCase):
         Post-condition 2: create duplicates and make sure only one appears
         """
         cp = ep.CreatePlaylist(Resource)
+        user = new_user()
         new_playlist = new_entity_name("playlist")
-        cp.post(new_playlist)
-        self.assertRaises(wz.NotAcceptable, cp.post, (new_playlist))
-
+        cp.post(user, new_playlist)
+        self.assertRaises(wz.NotAcceptable, cp.post, user, new_playlist)
     def test_search_playlist1(self):
         """
         Post-condition 1: successfully search for a playlist that exists
@@ -80,15 +85,15 @@ class EndpointTestCase(TestCase):
         dbp.add_playlist(newplaylist)
         sp = ep.SearchPlaylist(Resource)
         ret = sp.get(newplaylist)
-        self.assertEqual(newplaylist, ret[dbp.PLNAME])
+        self.assertEqual(newplaylist, ret[0][dbp.PLNAME])
 
     def test_search_playlist2(self):
         """
-        Post-condition 2: searching for a playlist that does not exist returns an error
+        Post-condition 2: searching for a playlist that does not exist returns empty list
         """    
-        newplaylist = new_entity_name("playlist")
         sp = ep.SearchPlaylist(Resource)
-        self.assertRaises(wz.NotFound, sp.get, newplaylist)
+        ret = sp.get('zzzzzzzzzzzzzzzzz')
+        self.assertEqual(ret, [])
 
     def test_delete_playlist1(self):
         """

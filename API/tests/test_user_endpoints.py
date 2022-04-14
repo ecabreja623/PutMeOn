@@ -107,15 +107,14 @@ class EndpointTestCase(TestCase):
         dbu.add_user(newuser, FAKE_PASSWORD)
         su = ep.SearchUser(Resource)
         ret = su.get(newuser)
-        self.assertEqual(newuser, ret[dbu.USERNAME])
+        self.assertEqual(newuser, ret[0][dbu.USERNAME])
 
     def test_search_user2(self):
         """
         Post-condition 2: searching for a user that does not exist returns an error
         """    
-        newuser = new_entity_name("user")
         su = ep.SearchUser(Resource)
-        self.assertRaises(wz.NotFound, su.get, newuser)
+        self.assertEqual(su.get('zzzzzzzzz'), [])
 
     def test_delete_user1(self):
         """

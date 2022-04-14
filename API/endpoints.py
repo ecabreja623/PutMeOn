@@ -92,6 +92,7 @@ class LoginUser(Resource):
         """
         This method supports telling the frontend
         if their authorization details are correct
+        returns auth token
         """
         token = dbu.login(username, password)
         if token == dbu.NOT_FOUND:
@@ -114,7 +115,8 @@ class SearchUser(Resource):
         """
         This method finds a user in the database
         """
-        ret = dbu.get_user(username)
+        ret = dbu.get_users()
+        ret = [user for user in ret if username in user[dbu.USERNAME]]
         if ret == dbu.NOT_FOUND:
             raise (wz.NotFound("User not found."))
         return ret
@@ -194,7 +196,7 @@ class DecRequest(Resource):
     @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
     def post(self, usern1, usern2):
         """
-        This method adds two users to each others friend lists
+        This method removes two users to each others request lists
         """
         if usern1 != usern2:
             user1, user2 = dbu.get_user(usern1), dbu.get_user(usern2)
@@ -337,7 +339,7 @@ class ListPlaylists(Resource):
             return playlists
 
 
-@api.route('/playlists/create/<playlist_name>')
+@api.route('/playlists/create/<user_name>/<playlist_name>')
 class CreatePlaylist(Resource):
     """
     This class supports adding a playlist to the database.
@@ -345,7 +347,7 @@ class CreatePlaylist(Resource):
     @api.response(HTTPStatus.OK, 'Success')
     @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
     @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
-    def post(self, playlist_name):
+    def post(self, user_name, playlist_name):
         """
         This method adds a playlist to the database
         """
@@ -354,7 +356,8 @@ class CreatePlaylist(Resource):
             raise (wz.NotFound("Playlist db not found."))
         elif ret == dbp.DUPLICATE:
             raise (wz.NotAcceptable("Playlist already exists."))
-        return f"{playlist_name} added."
+        dbu.create_playlist(user_name, playlist_name)
+        return f"{user_name} created {playlist_name}."
 
 
 @api.route('/playlists/search/<playlist_name>')
@@ -369,7 +372,8 @@ class SearchPlaylist(Resource):
         """
         This method searches for a playlist in the database
         """
-        ret = dbp.get_playlist(playlist_name)
+        ret = dbp.get_playlists()
+        ret = [pl for pl in ret if playlist_name in pl['playlistName']]
         if ret == dbp.NOT_FOUND:
             raise (wz.NotFound("playlist not found."))
         return ret

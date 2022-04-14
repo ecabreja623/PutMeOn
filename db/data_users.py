@@ -248,6 +248,13 @@ def unlike_playlist(username, playlist_name):
     update_user(username, {"$pull": {"likedPlaylists": playlist_name}})
 
 
+def create_playlist(username, playlist_name):
+    """
+    adds a playlist name to a user's created playlists
+    """
+    update_user(username, {"$push": {"createdPlaylists": playlist_name}})
+
+
 def empty():
     """
     empty out the users in the database
