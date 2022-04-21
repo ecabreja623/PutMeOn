@@ -31,18 +31,6 @@ class EndpointTestCase(TestCase):
     def tearDown(self):
         pass
 
-    def test_hello(self):
-        hello = ep.HelloWorld(Resource)
-        ret = hello.get()
-        self.assertIsInstance(ret, dict)
-        self.assertIn(ep.HELLO, ret)
-
-    def test_endpoints(self):
-        endp = ep.Endpoints(Resource)
-        ret = endp.get()
-        self.assertIn("Available endpoints", ret)
-        self.assertIsInstance(ret["Available endpoints"], list)
-
     #USER TESTS
 
     def test_list_users1(self):

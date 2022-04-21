@@ -8,6 +8,7 @@ Only for user related database calls
 import db.db_connect as dbc
 import db.data_playlists as dbp
 import db.usertoken as token
+import hashlib
 
 PLAYLISTS = "playlists"
 USERS = "users"
@@ -15,6 +16,7 @@ USERS = "users"
 PLNAME = "playlistName"
 USERNAME = "userName"
 PASSWORD = "password"
+TOKEN = "token"
 
 client = dbc.get_client()
 if client is None:
@@ -25,6 +27,10 @@ OK = 0
 NOT_FOUND = 1
 DUPLICATE = 2
 NOT_ACCEPTABLE = 3
+
+
+def sha(string):
+    return hashlib.sha256(string.encode()).hexdigest()
 
 
 def get_users():
@@ -75,7 +81,7 @@ def add_user(username, password):
         return DUPLICATE
     else:
         dbc.insert_doc(USERS, {USERNAME: username,
-                               PASSWORD: hash(password),
+                               PASSWORD: sha(password),
                                "outgoingRequests": [],
                                "incomingRequests": [],
                                "friends": [],
@@ -91,7 +97,7 @@ def check_password(username, password):
     checks a user's password without potentially exposing it to an endpoint
     """
     user = dbc.fetch_one(USERS, filters={USERNAME: username})
-    return hash(password) == user[PASSWORD]
+    return sha(password) == user[PASSWORD]
 
 
 def login(username, password):

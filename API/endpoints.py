@@ -4,9 +4,9 @@ The endpoint called `endpoints` will return all available endpoints.
 """
 
 from http import HTTPStatus
-from flask import Flask  # , request
+from flask import Flask
 from flask_cors import CORS
-from flask_restx import Resource, Api
+from flask_restx import Resource, Api, reqparse
 import werkzeug.exceptions as wz
 import db.data_playlists as dbp
 import db.data_users as dbu
@@ -18,6 +18,10 @@ CORS(app)
 HELLO = 'Hola'
 WORLD = 'mundo'
 
+user_parser = reqparse.RequestParser()
+user_parser.add_argument(dbu.USERNAME)
+user_parser.add_argument(dbu.TOKEN)
+
 
 @api.route('/hello')
 class HelloWorld(Resource):
@@ -25,12 +29,19 @@ class HelloWorld(Resource):
     The purpose of the HelloWorld class is to have a simple test to see if the
     app is working at all.
     """
-    def get(self):
+    @api.doc(parser=user_parser)
+    def post(self):
         """
         A trivial endpoint to see if the server is running.
         It just answers with "hola mundo".
         """
-        return {HELLO: WORLD}
+        args = user_parser.parse_args()
+        name = args[dbu.USERNAME]
+        token = args[dbu.TOKEN]
+        if dbu.check_auth(name, token):
+            return {HELLO: WORLD}
+        else:
+            return {"GOODBYE": WORLD}
 
 
 @api.route('/endpoints')
@@ -101,6 +112,24 @@ class LoginUser(Resource):
             raise (wz.NotAcceptable("Incorrect Password"))
         else:
             return token
+
+
+@api.route('/users/get/<username>')
+class GetUser(Resource):
+    """
+    This class supports finding a user given its username
+    """
+    @api.response(HTTPStatus.OK, 'Success')
+    @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
+    @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
+    def get(self, username):
+        """
+        This method finds a user in the database
+        """
+        ret = dbu.get_user(username)
+        if ret == dbu.NOT_FOUND:
+            raise (wz.NotFound("User not found."))
+        return ret
 
 
 @api.route('/users/search/<username>')
