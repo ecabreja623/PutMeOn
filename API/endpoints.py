@@ -266,6 +266,10 @@ class BefriendUser(Resource):
                     usern2 in user1['incomingRequests']:
                 dbu.bef_user(usern1, usern2)
                 return f"{usern1} and {usern2} are now friends"
+            elif usern2 in user1['outgoingRequests'] and \
+                    usern1 in user2['incomingRequests']:
+                dbu.bef_user(usern2, usern1)
+                return f"{usern2} and {usern1} are now friends"
             else:
                 return(wz.NotAcceptable("Neither user has\
                      sent a friend request"))
