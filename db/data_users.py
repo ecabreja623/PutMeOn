@@ -258,7 +258,7 @@ def create_playlist(username, playlist_name):
     """
     adds a playlist name to a user's created playlists
     """
-    update_user(username, {"$push": {"createdPlaylists": playlist_name}})
+    update_user(username, {"$push": {"ownedPlaylists": playlist_name}})
 
 
 def empty():
