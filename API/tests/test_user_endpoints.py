@@ -5,7 +5,6 @@ This file holds the user tests for endpoints.py
 from unittest import TestCase, skip
 from flask_restx import Resource, Api
 import random
-from itsdangerous import json
 import werkzeug.exceptions as wz
 
 import API.endpoints as ep
