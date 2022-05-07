@@ -5,14 +5,24 @@ This file holds the user tests for endpoints.py
 from unittest import TestCase, skip
 from flask_restx import Resource, Api
 import random
+from itsdangerous import json
 import werkzeug.exceptions as wz
 
 import API.endpoints as ep
 import db.data_playlists as dbp
 import db.data_users as dbu
 
+FAKE_PLAYLIST = 'Fake Playlist'
+FAKE_USER = "FakeUser"
+
+TEST_CLIENT = ep.app.test_client()
 HUGE_NUM = 1000000000
 FAKE_PASSWORD = "FakePassword"
+
+def login():
+    user = new_entity()
+    token = dbu.login(user, FAKE_PASSWORD)
+    return {dbu.USERNAME: user, dbu.TOKEN: token}
 
 def new_entity_name(entity_type):
     int_name = random.randint(0,HUGE_NUM)
@@ -30,6 +40,10 @@ class EndpointTestCase(TestCase):
 
     def tearDown(self):
         pass
+
+    def testHello(self):
+        fields = login()
+        TEST_CLIENT.post("/hello", json=fields)
 
     #USER TESTS
 
@@ -99,49 +113,42 @@ class EndpointTestCase(TestCase):
 
     def test_search_user2(self):
         """
-        Post-condition 2: searching for a user that does not exist returns an error
+        Post-condition 2: searching for a user that does not exist returns an empty list
         """    
         su = ep.SearchUser(Resource)
-        self.assertEqual(su.get('zzzzzzzzz'), [])
+        self.assertEqual(su.get(FAKE_USER), [])
 
     def test_delete_user1(self):
         """
         Post-condition 1: we can create and delete a user
         """
-        new_user = new_entity_name("user")
-        dbu.add_user(new_user, FAKE_PASSWORD)
-        du = ep.DeleteUser(Resource)
-        du.delete(new_user)
-        self.assertNotIn(new_user, dbu.get_users())
+        body = login()
+        TEST_CLIENT.delete(f'/users/delete/{body[dbu.USERNAME]}', json=body)
+        self.assertNotIn(body[dbu.USERNAME], dbu.get_users_dict())
 
     def test_delete_user2(self):
         """
-        Post-condition 2: deleting a user that does not exist results in a wz.NotAcceptable error
+        Post-condition 2: deleting another user fails
         """
-        new_user = new_entity_name("user")
-        du = ep.DeleteUser(Resource)
-        self.assertRaises(wz.NotFound, du.delete, new_user)
+        body = login()
+        other = login()
+        TEST_CLIENT.delete(f'/users/delete/{other[dbu.USERNAME]}', json=body)
+        self.assertIn(other[dbu.USERNAME], dbu.get_users_dict())
 
     def test_delete_user3(self):
         """
-        Post-condition 3: deleting a user results in friends being removed from its database and it being removed from a playlist's likes
+        Post-condition 3: deleting a user results in friends being removed from its database and its created playlists being deleted
         """
-        newuser = new_entity_name("user")
-        dbu.add_user(newuser, FAKE_PASSWORD)
-        newfriend = new_entity_name("user")
-        dbu.add_user(newfriend, FAKE_PASSWORD)
-        af = ep.BefriendUser(Resource)
-        af.post(newuser, newfriend)
-        newpl = new_entity_name("playlist")
-        dbp.add_playlist(newpl)
-        lp = ep.LikePlaylist(Resource)
-        lp.post(newuser, newpl)
-        du = ep.DeleteUser(Resource)
-        du.delete(newuser)
-        friend = dbu.get_user(newfriend)
-        pl = dbp.get_playlist(newpl)
-        self.assertNotIn(newuser, friend['friends'])
-        self.assertNotIn(newuser, pl['likes'])
+        body1 = login()
+        body2 = login()
+        TEST_CLIENT.post(f'/users/{body1[dbu.USERNAME]}/req_friend/{body2[dbu.USERNAME]}')
+        TEST_CLIENT.post(f'/users/{body2[dbu.USERNAME]}/add_friend/{body1[dbu.USERNAME]}')
+        TEST_CLIENT.post(f'/playlist/create/{body1[dbu.USERNAME]}/{FAKE_PLAYLIST}', json=body1)
+        TEST_CLIENT.delete(f'/users/delete/{body1[dbu.USERNAME]}', json=body1)
+        self.assertNotIn(body1[dbu.USERNAME], dbu.get_users_dict())
+        self.assertNotIn(FAKE_PLAYLIST, dbp.get_playlists_dict())
+        self.assertNotIn(body1[dbu.USERNAME], dbu.get_user(body2[dbu.USERNAME])['friends'])
+
 
     def test_add_friends1(self):
         """
@@ -423,7 +430,7 @@ class EndpointTestCase(TestCase):
         user = new_entity()
         li = ep.LoginUser(Resource)
         assrt = li.get(user, FAKE_PASSWORD)
-        self.assertIsInstance(assrt, str)
+        self.assertIsInstance(assrt[dbu.TOKEN], str)
 
     def test_login2(self):
         """

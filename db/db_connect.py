@@ -31,7 +31,7 @@ def get_client():
         client = pm.MongoClient()
     else:
         print("Connecting to remote mongo")
-        client = pm.MongoClient(CONN_STR)  # , server_api=ServerApi('1'))
+        client = pm.MongoClient(CONN_STR)
     return client
 
 

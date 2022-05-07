@@ -4,9 +4,9 @@ The endpoint called `endpoints` will return all available endpoints.
 """
 
 from http import HTTPStatus
-from flask import Flask
+from flask import Flask, request
 from flask_cors import CORS
-from flask_restx import Resource, Api, reqparse
+from flask_restx import Resource, Api, fields
 import werkzeug.exceptions as wz
 import db.data_playlists as dbp
 import db.data_users as dbu
@@ -18,9 +18,22 @@ CORS(app)
 HELLO = 'Hola'
 WORLD = 'mundo'
 
-user_parser = reqparse.RequestParser()
-user_parser.add_argument(dbu.USERNAME)
-user_parser.add_argument(dbu.TOKEN)
+TOKEN_FIELDS = api.model('User_Token', {
+    dbu.USERNAME: fields.String,
+    dbu.TOKEN: fields.String
+})
+
+
+def verify_header(json, username=None):
+    """
+    easier than just writing these 3 lines over and over
+    """
+    if username == '':
+        username = json[dbu.USERNAME]
+    token = json[dbu.TOKEN]
+    name = json[dbu.USERNAME]
+    if not dbu.check_auth(name, token) or name != username:
+        raise (wz.NotAcceptable("INVALID SESSION"))
 
 
 @api.route('/hello')
@@ -29,19 +42,14 @@ class HelloWorld(Resource):
     The purpose of the HelloWorld class is to have a simple test to see if the
     app is working at all.
     """
-    @api.doc(parser=user_parser)
+    @api.expect(TOKEN_FIELDS)
     def post(self):
         """
         A trivial endpoint to see if the server is running.
         It just answers with "hola mundo".
         """
-        args = user_parser.parse_args()
-        name = args[dbu.USERNAME]
-        token = args[dbu.TOKEN]
-        if dbu.check_auth(name, token):
-            return {HELLO: WORLD}
-        else:
-            return {"GOODBYE": WORLD}
+        verify_header(request.json)
+        return {HELLO: WORLD}
 
 
 @api.route('/endpoints')
@@ -111,7 +119,7 @@ class LoginUser(Resource):
         elif token == dbu.NOT_ACCEPTABLE:
             raise (wz.NotAcceptable("Incorrect Password"))
         else:
-            return token
+            return {dbu.TOKEN: token}
 
 
 @api.route('/users/get/<username>')
@@ -159,20 +167,30 @@ class DeleteUser(Resource):
     @api.response(HTTPStatus.OK, 'Success')
     @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
     @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
+    @api.expect(TOKEN_FIELDS)
     def delete(self, username):
         """
         This method deletes a user from the database
         """
         ret = dbu.get_user(username)
+        verify_header(request.json, username)
         if ret == dbu.NOT_FOUND:
             raise (wz.NotFound("User db not found."))
         else:
+            deleter = DeletePlaylist(Resource)
+            for pl in ret['ownedPlaylists']:
+                deleter.delete(pl)
             unliker = UnlikePlaylist(Resource)
             for pl in ret["likedPlaylists"]:
                 unliker.post(username, pl)
             unfriender = UnfriendUser(Resource)
             for friend in ret['friends']:
                 unfriender.post(username, friend)
+            decliner = DecRequest(Resource)
+            for friend in ret['outgoingRequests']:
+                decliner.post(friend, username)
+            for friend in ret['incomingRequests']:
+                decliner.post(username, friend)
             dbu.del_user(username)
         return f"{username} deleted."
 
@@ -188,10 +206,6 @@ class RequestUser(Resource):
     def post(self, usern1, usern2):
         """
         This method adds two users to each others friend lists
-        """
-        """
-        want to add:
-        if check_auth(usern1, request.get_json()['token']):
         """
         if usern1 != usern2:
             user1, user2 = dbu.get_user(usern1), dbu.get_user(usern2)
@@ -380,10 +394,12 @@ class CreatePlaylist(Resource):
     @api.response(HTTPStatus.OK, 'Success')
     @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
     @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
+    @api.expect(TOKEN_FIELDS)
     def post(self, user_name, playlist_name):
         """
         This method adds a playlist to the database
         """
+        verify_header(request.json, user_name)
         ret = dbp.add_playlist(playlist_name)
         if ret == dbp.NOT_FOUND:
             raise (wz.NotFound("Playlist db not found."))

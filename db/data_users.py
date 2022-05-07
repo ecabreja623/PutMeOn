@@ -218,7 +218,7 @@ def get_created_playlists(username):
     """
     returns a complete list of a user's created playlists
     """
-    return get_users_playlists(username, 'createdPlaylists')
+    return get_users_playlists(username, 'ownedPlaylists')
 
 
 def get_users_playlists(username, param):
@@ -259,6 +259,13 @@ def create_playlist(username, playlist_name):
     adds a playlist name to a user's created playlists
     """
     update_user(username, {"$push": {"ownedPlaylists": playlist_name}})
+
+
+def delete_playlist(username, playlist_name):
+    """
+    deletes a playlist name from a user's created playlists
+    """
+    update_user(username, {"$pull": {"ownedPlaylists": playlist_name}})
 
 
 def empty():

@@ -6,6 +6,7 @@ from unittest import TestCase, skip
 from flask_restx import Resource, Api
 import random
 import werkzeug.exceptions as wz
+from tests.test_user_endpoints import FAKE_PLAYLIST
 
 import API.endpoints as ep
 import db.data_playlists as dbp
@@ -13,6 +14,11 @@ import db.data_users as dbu
 
 HUGE_NUM = 1000000000
 FAKE_PASSWORD = "FakePassword"
+
+def login():
+    user = new_user()
+    token = dbu.login(user, FAKE_PASSWORD)
+    return {dbu.USERNAME: user, dbu.TOKEN: token}
 
 def new_entity_name(entity_type):
     int_name = random.randint(0,HUGE_NUM)
@@ -22,6 +28,8 @@ def new_user():
     new = new_entity_name("USER")
     dbu.add_user(new, FAKE_PASSWORD)
     return new
+
+TEST_CLIENT = ep.app.test_client()
 
 class EndpointTestCase(TestCase):
     def setUp(self):
@@ -61,22 +69,24 @@ class EndpointTestCase(TestCase):
         """
         Post-condition 1: create playlist and check if in db
         """
-        user = new_user()
-        cp = ep.CreatePlaylist(Resource)
-        new_playlist = new_entity_name("playlist")
-        cp.post(user, new_playlist)
+        body = login()
+        TEST_CLIENT.post(f'/playlists/create/{body[dbu.USERNAME]}/{FAKE_PLAYLIST}', json=body)
         playlists = dbp.get_playlists_dict()
-        self.assertIn(new_playlist, playlists)
+        self.assertIn(FAKE_PLAYLIST, playlists)
     
     def test_create_playlist2(self):
         """
         Post-condition 2: create duplicates and make sure only one appears
         """
-        cp = ep.CreatePlaylist(Resource)
-        user = new_user()
-        new_playlist = new_entity_name("playlist")
-        cp.post(user, new_playlist)
-        self.assertRaises(wz.NotAcceptable, cp.post, user, new_playlist)
+        body = login()
+        TEST_CLIENT.post(f'/playlists/create/{body[dbu.USERNAME]}/{FAKE_PLAYLIST}', json=body)
+        playlists = dbp.get_playlists_dict()
+        self.assertIn(FAKE_PLAYLIST, playlists)
+        TEST_CLIENT.post(f'/playlists/create/{body[dbu.USERNAME]}/{FAKE_PLAYLIST}', json=body)
+        list = dbp.get_playlists()
+        list = [item['playlistName'] for item in list if item['playlistName'] == FAKE_PLAYLIST]
+        self.assertEqual(len(list), 1)
+        
     def test_search_playlist1(self):
         """
         Post-condition 1: successfully search for a playlist that exists
