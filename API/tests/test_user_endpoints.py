@@ -42,7 +42,8 @@ class EndpointTestCase(TestCase):
 
     def testHello(self):
         fields = login()
-        TEST_CLIENT.post("/hello", json=fields)
+        response = TEST_CLIENT.post("/hello", json=fields)
+        self.assertEqual(response.json, {"Hola": "mundo"})
 
     #USER TESTS
 
@@ -446,3 +447,59 @@ class EndpointTestCase(TestCase):
         user = new_entity_name('user')
         li = ep.LoginUser(Resource)
         self.assertRaises(wz.NotFound, li.get, user, FAKE_PASSWORD)
+
+    def test_get_friends1(self):
+        """
+        Post-condition 1: a user that does not exist will return a wz.NotFound error
+        """
+        user = new_entity_name("user")
+        gf = ep.GetFriends(Resource)
+        self.assertRaises(wz.NotFound, gf.get, user)
+
+    def test_get_friends2(self):
+        """
+        Post-condition 2: a user with friends will have these friends in the response
+        """
+        user1 = new_entity()
+        user2 = new_entity()
+        ru = ep.RequestUser(Resource)
+        ru.post(user1, user2)
+        af = ep.BefriendUser(Resource)
+        af.post(user2, user1)
+        gf = ep.GetFriends(Resource)
+        self.assertEqual([dbu.get_user(user1)], gf.get(user2))
+
+    def test_get_likes1(self):
+        """
+        Post-condition 1: a user that does not exist will return a wz.NotFound error
+        """
+        user = new_entity_name('user')
+        gl = ep.GetLikedPlaylists(Resource)
+        self.assertRaises(wz.NotFound, gl.get, user)
+    
+    def test_get_friends2(self):
+        """
+        Post-condition 2: a user with liked playlists can get them
+        """
+        user = new_entity()
+        dbp.add_playlist(FAKE_PLAYLIST)
+        dbu.like_playlist(user, FAKE_PLAYLIST)
+        gl = ep.GetLikedPlaylists(Resource)
+        self.assertEqual([dbp.get_playlist(FAKE_PLAYLIST)], gl.get(user))
+
+    def test_get_made1(self):
+        """
+        Post-condition 1: a user that does not exist will return a wz.NotFound error
+        """
+        user = new_entity_name('user')
+        gp = ep.GetOwnedPlaylists(Resource)
+        self.assertRaises(wz.NotFound, gp.get, user)
+    
+    def test_get_friends2(self):
+        """
+        Post-condition 2: a user with playlists can get them
+        """
+        body = login()
+        TEST_CLIENT.post(f'/playlists/create/{body[dbu.USERNAME]}/{FAKE_PLAYLIST}', json=body)
+        gp = ep.GetOwnedPlaylists(Resource)
+        self.assertEqual([dbp.get_playlist(FAKE_PLAYLIST)], gp.get(body[dbu.USERNAME]))

@@ -28,11 +28,11 @@ def verify_header(json, username=None):
     """
     easier than just writing these 3 lines over and over
     """
-    if username == '':
+    if not username:
         username = json[dbu.USERNAME]
     token = json[dbu.TOKEN]
     name = json[dbu.USERNAME]
-    if not dbu.check_auth(name, token) or name != username:
+    if not dbu.check_auth(name, token) or username != name:
         raise (wz.NotAcceptable("INVALID SESSION"))
 
 
@@ -364,6 +364,49 @@ class UnlikePlaylist(Resource):
         else:
             dbu.unlike_playlist(username, playlist_name)
             return f"{username} removed {playlist_name} from their playlists"
+
+
+@api.route('/users/get_friends/<username>')
+class GetFriends(Resource):
+    """
+    This class supports listing all of a user's friends
+    """
+    @api.response(HTTPStatus.NOT_FOUND, 'User not found')
+    def get(self, username):
+        user = dbu.get_user(username)
+        if user == dbu.NOT_FOUND:
+            raise(wz.NotFound(f"User {username} not found"))
+        else:
+            return dbu.get_friends(username)
+
+
+@api.route('/users/get_owned_playlists/<username>')
+class GetOwnedPlaylists(Resource):
+    """
+    This class supports listing all playlists a user has created
+    """
+    @api.response(HTTPStatus.NOT_FOUND, 'User not found')
+    def get(self, username):
+        user = dbu.get_user(username)
+        if user == dbu.NOT_FOUND:
+            raise(wz.NotFound(f"User {username} not found"))
+        else:
+            return dbu.get_created_playlists(username)
+
+
+@api.route('/users/get_likes/<username>')
+class GetLikedPlaylists(Resource):
+    """
+    This class supports listing all of a user's liked playlists
+    """
+    @api.response(HTTPStatus.NOT_FOUND, 'User not found')
+    def get(self, username):
+        user = dbu.get_user(username)
+        if user == dbu.NOT_FOUND:
+            raise(wz.NotFound(f"User {username} not found"))
+        else:
+            return dbu.get_liked_playlists(username)
+
 
 # PLAYLIST METHODS
 
