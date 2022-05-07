@@ -27,6 +27,11 @@ TOKEN_FIELDS = api.model('User_Token', {
     dbu.TOKEN: fields.String
 })
 
+LOGIN_FIELDS = api.model('User_Pass', {
+    dbu.USERNAME: fields.String,
+    dbu.PASSWORD: fields.String
+})
+
 
 def verify_header(json, username=None):
     """
@@ -87,36 +92,45 @@ class ListUsers(Resource):
         return users
 
 
-@user_ns.route('/create/<username>_<password>')
+@user_ns.route('/create/')
 class CreateUser(Resource):
     """
     This class supports adding a user to the database.
     """
+    @user_ns.expect(LOGIN_FIELDS)
     @user_ns.response(HTTPStatus.OK, 'Success')
     @user_ns.response(HTTPStatus.NOT_FOUND, 'Not Found')
     @user_ns.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
-    def post(self, username, password):
+    def post(self):
         """
         This method adds a user to the database
         """
+        username = request.json[dbu.USERNAME]
+        password = request.json[dbu.PASSWORD]
         ret = dbu.add_user(username, password)
         if ret == dbu.DUPLICATE:
             raise (wz.NotAcceptable("User already exists."))
-        return f"{username} added."
+        return {"message": f"{username} added."}
 
 
-@user_ns.route('/login/<username>_<password>')
+@user_ns.route('/login/')
 class LoginUser(Resource):
     """
     This class supports a user getting authorization from the API
     given the correct username and password
     """
-    def get(self, username, password):
+    @user_ns.expect(LOGIN_FIELDS)
+    @user_ns.response(HTTPStatus.OK, 'Success')
+    @user_ns.response(HTTPStatus.NOT_FOUND, 'Not Found')
+    @user_ns.response(HTTPStatus.NOT_ACCEPTABLE, 'Incorrect Password')
+    def get(self):
         """
         This method supports telling the frontend
         if their authorization details are correct
         returns auth token
         """
+        username = request.json[dbu.USERNAME]
+        password = request.json[dbu.PASSWORD]
         token = dbu.login(username, password)
         if token == dbu.NOT_FOUND:
             raise (wz.NotFound("Username not found"))
@@ -515,10 +529,12 @@ class AddToPlaylist(Resource):
     @playlist_ns.response(HTTPStatus.OK, 'Success')
     @playlist_ns.response(HTTPStatus.NOT_FOUND, 'Not Found')
     @playlist_ns.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
+    @playlist_ns.expect(TOKEN_FIELDS)
     def post(self, pl_name, song_name):
         """
         This method adds a song to a playlist in the database
         """
+        verify_header(request.json)
         playlist = dbp.get_playlist(pl_name)
         if playlist == dbp.NOT_FOUND:
             raise (wz.NotFound("Playlist db not found."))
@@ -535,6 +551,7 @@ class RemoveFromPlaylist(Resource):
     """
     This class supports removing a song from a playlist in the database.
     """
+    @playlist_ns.expect(TOKEN_FIELDS)
     @playlist_ns.response(HTTPStatus.OK, 'Success')
     @playlist_ns.response(HTTPStatus.NOT_FOUND, 'Not Found')
     @playlist_ns.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
@@ -542,6 +559,7 @@ class RemoveFromPlaylist(Resource):
         """
         This method removes a song from a playlist in the database
         """
+        verify_header(request.json)
         playlist = dbp.get_playlist(pl_name)
         if playlist == dbp.NOT_FOUND:
             raise (wz.NotFound("Playlist not found."))

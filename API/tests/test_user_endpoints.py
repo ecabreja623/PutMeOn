@@ -86,9 +86,8 @@ class EndpointTestCase(TestCase):
         """
         Post-condition 1: create user and check if in db
         """
-        cu = ep.CreateUser(Resource)
         new_user = new_entity_name("user")
-        ret = cu.post(new_user, FAKE_PASSWORD)
+        TEST_CLIENT.post('/users/create/', json={"userName": new_user, "password": FAKE_PASSWORD})
         users = dbu.get_users_dict()
         self.assertIn(new_user, users)
     
@@ -96,10 +95,10 @@ class EndpointTestCase(TestCase):
         """
         Post-condition 2: create duplicates and make sure only one appears
         """
-        cu = ep.CreateUser(Resource)
         new_user = new_entity_name("user")
-        cu.post(new_user, FAKE_PASSWORD)
-        self.assertRaises(wz.NotAcceptable, cu.post, new_user, FAKE_PASSWORD)
+        assrt = TEST_CLIENT.post('/users/create/', json={"userName": new_user, "password": FAKE_PASSWORD})
+        assrt = TEST_CLIENT.post('/users/create/', json={"userName": new_user, "password": FAKE_PASSWORD})
+        self.assertIn("User already exists.", assrt.json['message'])
 
     def test_search_user1(self):
         """
@@ -428,25 +427,24 @@ class EndpointTestCase(TestCase):
         Post-condition 1: a user can log into their account
         """
         user = new_entity()
-        li = ep.LoginUser(Resource)
-        assrt = li.get(user, FAKE_PASSWORD)
-        self.assertIsInstance(assrt[dbu.TOKEN], str)
+        assrt = TEST_CLIENT.get('/users/login/', json={"userName": user, "password": FAKE_PASSWORD})
+        self.assertIsInstance(assrt.json[dbu.TOKEN], str)
 
     def test_login2(self):
         """
         Post-condition 2: a user cannot log in with an incorrect password
         """
         user = new_entity()
-        li = ep.LoginUser(Resource)
-        self.assertRaises(wz.NotAcceptable, li.get, user, user)
+        assrt = TEST_CLIENT.get('/users/login/', json={"userName": user, "password": "QQQQ"})
+        self.assertIn('Incorrect Password', assrt.json['message'])
     
     def test_login3(self):
         """
         Post-condition 3: a user cannot log in with a username that doesn't exist
         """
         user = new_entity_name('user')
-        li = ep.LoginUser(Resource)
-        self.assertRaises(wz.NotFound, li.get, user, FAKE_PASSWORD)
+        assrt = TEST_CLIENT.get('/users/login/', json={"userName": user, "password": FAKE_PASSWORD})
+        self.assertIn("Username not found", assrt.json['message'])
 
     def test_get_friends1(self):
         """

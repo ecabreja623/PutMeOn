@@ -2,8 +2,8 @@
 This file holds the user tests for endpoints.py
 """
 
-from unittest import TestCase, skip
-from flask_restx import Resource, Api
+from unittest import TestCase
+from flask_restx import Resource
 import random
 import werkzeug.exceptions as wz
 from tests.test_user_endpoints import FAKE_PLAYLIST
@@ -83,10 +83,8 @@ class EndpointTestCase(TestCase):
         TEST_CLIENT.post(f'/playlists/create/{body[dbu.USERNAME]}/{FAKE_PLAYLIST}', json=body)
         playlists = dbp.get_playlists_dict()
         self.assertIn(FAKE_PLAYLIST, playlists)
-        TEST_CLIENT.post(f'/playlists/create/{body[dbu.USERNAME]}/{FAKE_PLAYLIST}', json=body)
-        list = dbp.get_playlists()
-        list = [item['playlistName'] for item in list if item['playlistName'] == FAKE_PLAYLIST]
-        self.assertEqual(len(list), 1)
+        resp = TEST_CLIENT.post(f'/playlists/create/{body[dbu.USERNAME]}/{FAKE_PLAYLIST}', json=body)
+        self.assertEqual(resp.json['message'], 'Playlist already exists.')
         
     def test_search_playlist1(self):
         """
@@ -143,11 +141,11 @@ class EndpointTestCase(TestCase):
         """
         Post-condition1: we can add a new song to a new playlist
         """
-        ap = ep.AddToPlaylist(Resource)
+        body = login()
         newsong = new_entity_name("song")
         newplaylist = new_entity_name("playlist")
-        dbp.add_playlist(newplaylist, FAKE_USER)
-        ap.post(newplaylist, newsong)
+        dbp.add_playlist(newplaylist, body[dbu.USERNAME])
+        TEST_CLIENT.post(f"/playlists/{newplaylist}/add_song/{newsong}", json=body)
         pl = dbp.get_playlist(newplaylist)
         self.assertIn(newsong, pl["songs"])
 
@@ -155,25 +153,26 @@ class EndpointTestCase(TestCase):
         """
         Post-condition 2: we cannot add the same song to a playlist twice
         """
-        ap = ep.AddToPlaylist(Resource)
+        body = login()
         newsong = new_entity_name("song")
         newplaylist = new_entity_name("playlist")
-        dbp.add_playlist(newplaylist, FAKE_USER)
-        ap.post(newplaylist, newsong)
-        self.assertRaises(wz.NotAcceptable, ap.post, newplaylist, newsong)
+        dbp.add_playlist(newplaylist, body[dbu.USERNAME])
+        TEST_CLIENT.post(f"/playlists/{newplaylist}/add_song/{newsong}", json=body)
+        resp = TEST_CLIENT.post(f"/playlists/{newplaylist}/add_song/{newsong}", json=body)
+        self.assertEqual(resp.json['message'], "song already in playlist")
 
     def test_remove_song1(self):
         """
         Post-condition 1: we can remove a song from a playlist given that it is present
         """
+        body = login()
         newpl = new_entity_name("playlist")
-        dbp.add_playlist(newpl, FAKE_USER)
+        dbp.add_playlist(newpl, body[dbu.USERNAME])
         newsong = new_entity_name("song")
         dbp.add_song(newpl, newsong)
         pl = dbp.get_playlist(newpl)
         self.assertIn(newsong, pl['songs'])
-        rs = ep.RemoveFromPlaylist(Resource)
-        rs.post(newpl, newsong)
+        TEST_CLIENT.post(f"/playlists/{newpl}/remove_song/{newsong}", json=body)
         pl = dbp.get_playlist(newpl)
         self.assertNotIn(newsong, pl['songs'])
 
@@ -181,11 +180,12 @@ class EndpointTestCase(TestCase):
         """
         Post-condition 2: Removing a song when it is not present results in an error
         """
+        body = login()
         newpl = new_entity_name("playlist")
-        dbp.add_playlist(newpl, FAKE_USER)
+        dbp.add_playlist(newpl, body[dbu.USERNAME])
         newsong = new_entity_name("song")
-        rs = ep.RemoveFromPlaylist(Resource)
-        self.assertRaises(wz.NotFound, rs.post, newpl, newsong)
+        resp =TEST_CLIENT.post(f"/playlists/{newpl}/remove_song/{newsong}", json=body)
+        self.assertEqual(resp.json['message'], "song not in playlist")
 
     def test_remove_song3(self):
         """
@@ -193,5 +193,6 @@ class EndpointTestCase(TestCase):
         """
         newpl = new_entity_name("playlist")
         newsong = new_entity_name("song")
-        rs = ep.RemoveFromPlaylist(Resource)
-        self.assertRaises(wz.NotFound, rs.post, newpl, newsong)
+        body = login()
+        resp =TEST_CLIENT.post(f"/playlists/{newpl}/remove_song/{newsong}", json=body)
+        self.assertEqual(resp.json['message'], "Playlist not found.")
