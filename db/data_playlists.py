@@ -54,7 +54,7 @@ def get_playlist(playlist_name):
         return NOT_FOUND
 
 
-def add_playlist(playlist_name):
+def add_playlist(playlist_name, username):
     """
     creates a playlist, returns whether successful or not
     """
@@ -63,7 +63,8 @@ def add_playlist(playlist_name):
     else:
         dbc.insert_doc(PLAYLISTS, {PLNAME: playlist_name,
                                    "likes": [],
-                                   "songs": []
+                                   "songs": [],
+                                   'owner': username
                                    })
         return OK
 

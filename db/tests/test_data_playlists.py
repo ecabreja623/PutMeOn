@@ -45,7 +45,7 @@ class DBTestCase(TestCase):
         """
         Can we write to the playlist db?
         """
-        dbp.add_playlist(FAKE_PLAYLIST)
+        dbp.add_playlist(FAKE_PLAYLIST, FAKE_USER)
         playlist = dbp.get_playlist(FAKE_PLAYLIST)
         self.assertEqual(playlist[dbp.PLNAME], FAKE_PLAYLIST)
     

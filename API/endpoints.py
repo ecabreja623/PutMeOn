@@ -443,7 +443,7 @@ class CreatePlaylist(Resource):
         This method adds a playlist to the database
         """
         verify_header(request.json, user_name)
-        ret = dbp.add_playlist(playlist_name)
+        ret = dbp.add_playlist(playlist_name, user_name)
         if ret == dbp.NOT_FOUND:
             raise (wz.NotFound("Playlist db not found."))
         elif ret == dbp.DUPLICATE:
