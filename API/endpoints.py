@@ -123,7 +123,7 @@ class LoginUser(Resource):
     @user_ns.response(HTTPStatus.OK, 'Success')
     @user_ns.response(HTTPStatus.NOT_FOUND, 'Not Found')
     @user_ns.response(HTTPStatus.NOT_ACCEPTABLE, 'Incorrect Password')
-    def get(self):
+    def patch(self):
         """
         This method supports telling the frontend
         if their authorization details are correct

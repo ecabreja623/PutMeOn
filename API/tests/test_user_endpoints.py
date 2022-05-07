@@ -427,7 +427,7 @@ class EndpointTestCase(TestCase):
         Post-condition 1: a user can log into their account
         """
         user = new_entity()
-        assrt = TEST_CLIENT.get('/users/login/', json={"userName": user, "password": FAKE_PASSWORD})
+        assrt = TEST_CLIENT.patch('/users/login/', json={"userName": user, "password": FAKE_PASSWORD})
         self.assertIsInstance(assrt.json[dbu.TOKEN], str)
 
     def test_login2(self):
@@ -435,7 +435,7 @@ class EndpointTestCase(TestCase):
         Post-condition 2: a user cannot log in with an incorrect password
         """
         user = new_entity()
-        assrt = TEST_CLIENT.get('/users/login/', json={"userName": user, "password": "QQQQ"})
+        assrt = TEST_CLIENT.patch('/users/login/', json={"userName": user, "password": "QQQQ"})
         self.assertIn('Incorrect Password', assrt.json['message'])
     
     def test_login3(self):
@@ -443,7 +443,7 @@ class EndpointTestCase(TestCase):
         Post-condition 3: a user cannot log in with a username that doesn't exist
         """
         user = new_entity_name('user')
-        assrt = TEST_CLIENT.get('/users/login/', json={"userName": user, "password": FAKE_PASSWORD})
+        assrt = TEST_CLIENT.patch('/users/login/', json={"userName": user, "password": FAKE_PASSWORD})
         self.assertIn("Username not found", assrt.json['message'])
 
     def test_get_friends1(self):
