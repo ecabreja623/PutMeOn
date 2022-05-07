@@ -16,7 +16,8 @@ api = Api(app)
 CORS(app)
 
 user_ns = api.namespace('users', description="User related endpoints")
-playlist_ns = api.namespace('playlists', description="Playlist related endpoints")
+playlist_ns = api.namespace('playlists',
+                            description="Playlist related endpoints")
 
 HELLO = 'Hola'
 WORLD = 'mundo'
