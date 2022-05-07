@@ -334,7 +334,7 @@ class EndpointTestCase(TestCase):
         lp = ep.LikePlaylist(Resource)
         newuser = new_entity_name("user")
         newpl = new_entity_name("playlist")
-        dbp.add_playlist(newpl)
+        dbp.add_playlist(newpl, FAKE_USER)
         dbu.add_user(newuser, FAKE_PASSWORD)
         lp.post(newuser, newpl)
         u = dbu.get_user(newuser)
@@ -349,7 +349,7 @@ class EndpointTestCase(TestCase):
         lp = ep.LikePlaylist(Resource)
         newuser = new_entity_name("user")
         newpl = new_entity_name("playlist")
-        dbp.add_playlist(newpl)
+        dbp.add_playlist(newpl, FAKE_USER)
         dbu.add_user(newuser, FAKE_PASSWORD)
         lp.post(newuser, newpl)
         self.assertRaises(wz.NotAcceptable, lp.post, newuser, newpl)
@@ -361,7 +361,7 @@ class EndpointTestCase(TestCase):
         lp = ep.LikePlaylist(Resource)
         newuser = new_entity_name("user")
         newpl = new_entity_name("playlist")
-        dbp.add_playlist(newpl)
+        dbp.add_playlist(newpl, FAKE_USER)
         self.assertRaises(wz.NotFound, lp.post, newuser, newpl)
 
     def test_like_playlist4(self):
@@ -382,7 +382,7 @@ class EndpointTestCase(TestCase):
         up = ep.UnlikePlaylist(Resource)
         newuser = new_entity_name("user")
         newpl = new_entity_name("playlist")
-        dbp.add_playlist(newpl)
+        dbp.add_playlist(newpl, FAKE_USER)
         dbu.add_user(newuser, FAKE_PASSWORD)
         lp.post(newuser, newpl)
         up.post(newuser, newpl)
@@ -398,7 +398,7 @@ class EndpointTestCase(TestCase):
         up = ep.UnlikePlaylist(Resource)
         newuser = new_entity_name("user")
         newpl = new_entity_name("playlist")
-        dbp.add_playlist(newpl)
+        dbp.add_playlist(newpl, FAKE_USER)
         dbu.add_user(newuser, FAKE_PASSWORD)
         self.assertRaises(wz.NotFound, up.post, newuser, newpl)
 
@@ -409,7 +409,7 @@ class EndpointTestCase(TestCase):
         up = ep.UnlikePlaylist(Resource)
         newuser = new_entity_name("user")
         newpl = new_entity_name("playlist")
-        dbp.add_playlist(newpl)
+        dbp.add_playlist(newpl, FAKE_USER)
         self.assertRaises(wz.NotFound, up.post, newuser, newpl)
 
     def test_unlike_playlist4(self):
@@ -482,7 +482,7 @@ class EndpointTestCase(TestCase):
         Post-condition 2: a user with liked playlists can get them
         """
         user = new_entity()
-        dbp.add_playlist(FAKE_PLAYLIST)
+        dbp.add_playlist(FAKE_PLAYLIST, FAKE_USER)
         dbu.like_playlist(user, FAKE_PLAYLIST)
         gl = ep.GetLikedPlaylists(Resource)
         self.assertEqual([dbp.get_playlist(FAKE_PLAYLIST)], gl.get(user))

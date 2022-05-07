@@ -37,7 +37,7 @@ class DBTestCase(TestCase):
         """
         Can we fetch a playlist from the playlist db?
         """
-        dbp.add_playlist(FAKE_PLAYLIST)
+        dbp.add_playlist(FAKE_PLAYLIST, FAKE_USER)
         playlist = dbp.get_playlist(FAKE_PLAYLIST)
         self.assertIsInstance(playlist, dict)
 
@@ -53,7 +53,7 @@ class DBTestCase(TestCase):
         """
         Can we delete a playlist from the playlist db?
         """
-        dbp.add_playlist(FAKE_PLAYLIST)
+        dbp.add_playlist(FAKE_PLAYLIST, FAKE_USER)
         ret = dbp.del_playlist(FAKE_PLAYLIST)
         self.assertEqual(ret, dbp.OK)
         self.assertNotIn(FAKE_PLAYLIST, dbp.get_playlists())
@@ -62,7 +62,7 @@ class DBTestCase(TestCase):
         """
         Post-condition 1: returns true when a playlist exists, false otherwise
         """
-        dbp.add_playlist(FAKE_PLAYLIST)
+        dbp.add_playlist(FAKE_PLAYLIST, FAKE_USER)
         self.assertTrue(dbp.playlist_exists(FAKE_PLAYLIST))
         self.assertFalse(dbp.playlist_exists("FOO TRACKS TO BAR TO"))
 
@@ -71,7 +71,7 @@ class DBTestCase(TestCase):
         """
         Can we update a playlist?
         """
-        dbp.add_playlist(FAKE_PLAYLIST)
+        dbp.add_playlist(FAKE_PLAYLIST, FAKE_USER)
         dbp.update_playlist(FAKE_PLAYLIST, {"$push": {"songs":"FAKE SONG"}})
         dbp.update_playlist(FAKE_PLAYLIST, {"$push": {"likes":"FAKE USER"}})
         pl = dbp.get_playlist(FAKE_PLAYLIST)
@@ -88,7 +88,7 @@ class DBTestCase(TestCase):
         """
         newsong = "SONG"
         newplaylist = "PLAYLIST"
-        dbp.add_playlist(newplaylist)
+        dbp.add_playlist(newplaylist, FAKE_USER)
         dbp.add_song(newplaylist, newsong)
         pl = dbp.get_playlist(newplaylist)
         self.assertIn(newsong, pl["songs"])
@@ -99,7 +99,7 @@ class DBTestCase(TestCase):
         we can remove a song from a playlist
         """
         newpl = "PLAYLIST"
-        dbp.add_playlist(newpl)
+        dbp.add_playlist(newpl, FAKE_USER)
         newsong = "SONG"
         dbp.add_song(newpl, newsong)
         pl = dbp.get_playlist(newpl)
@@ -114,6 +114,6 @@ class DBTestCase(TestCase):
         we can empty the playlist collection
         """
         for i in range(10):
-            dbp.add_playlist("PLAYLIST")
+            dbp.add_playlist("PLAYLIST"+str(i), FAKE_USER)
         dbp.empty()
         self.assertEqual(len(dbp.get_playlists()), 0)
