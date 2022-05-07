@@ -2,7 +2,7 @@
 This file holds the tests for data_users.py
 """
 
-from unittest import TestCase, skip
+from unittest import TestCase
 
 import data_users as dbu
 import data_playlists as dbp
