@@ -15,6 +15,9 @@ app = Flask(__name__)
 api = Api(app)
 CORS(app)
 
+user_ns = api.namespace('users', description="User related endpoints")
+playlist_ns = api.namespace('playlists', description="Playlist related endpoints")
+
 HELLO = 'Hola'
 WORLD = 'mundo'
 
@@ -68,13 +71,13 @@ class Endpoints(Resource):
 # USER METHODS
 
 
-@api.route('/users/list')
+@user_ns.route('/list')
 class ListUsers(Resource):
     """
     THis endpoints returns a list of all the users
     """
-    @api.response(HTTPStatus.OK, 'Success')
-    @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
+    @user_ns.response(HTTPStatus.OK, 'Success')
+    @user_ns.response(HTTPStatus.NOT_FOUND, 'Not Found')
     def get(self):
         """
         Returns a list of all the users
@@ -83,14 +86,14 @@ class ListUsers(Resource):
         return users
 
 
-@api.route('/users/create/<username>_<password>')
+@user_ns.route('/create/<username>_<password>')
 class CreateUser(Resource):
     """
     This class supports adding a user to the database.
     """
-    @api.response(HTTPStatus.OK, 'Success')
-    @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
-    @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
+    @user_ns.response(HTTPStatus.OK, 'Success')
+    @user_ns.response(HTTPStatus.NOT_FOUND, 'Not Found')
+    @user_ns.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
     def post(self, username, password):
         """
         This method adds a user to the database
@@ -101,7 +104,7 @@ class CreateUser(Resource):
         return f"{username} added."
 
 
-@api.route('/users/login/<username>_<password>')
+@user_ns.route('/login/<username>_<password>')
 class LoginUser(Resource):
     """
     This class supports a user getting authorization from the API
@@ -122,14 +125,14 @@ class LoginUser(Resource):
             return {dbu.TOKEN: token}
 
 
-@api.route('/users/get/<username>')
+@user_ns.route('/get/<username>')
 class GetUser(Resource):
     """
     This class supports finding a user given its username
     """
-    @api.response(HTTPStatus.OK, 'Success')
-    @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
-    @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
+    @user_ns.response(HTTPStatus.OK, 'Success')
+    @user_ns.response(HTTPStatus.NOT_FOUND, 'Not Found')
+    @user_ns.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
     def get(self, username):
         """
         This method finds a user in the database
@@ -140,14 +143,14 @@ class GetUser(Resource):
         return ret
 
 
-@api.route('/users/search/<username>')
+@user_ns.route('/search/<username>')
 class SearchUser(Resource):
     """
     This class supports finding a user given its username
     """
-    @api.response(HTTPStatus.OK, 'Success')
-    @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
-    @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
+    @user_ns.response(HTTPStatus.OK, 'Success')
+    @user_ns.response(HTTPStatus.NOT_FOUND, 'Not Found')
+    @user_ns.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
     def get(self, username):
         """
         This method finds a user in the database
@@ -159,15 +162,15 @@ class SearchUser(Resource):
         return ret
 
 
-@api.route('/users/delete/<username>')
+@user_ns.route('/delete/<username>')
 class DeleteUser(Resource):
     """
     This class supports deleting a user from the database.
     """
-    @api.response(HTTPStatus.OK, 'Success')
-    @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
-    @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
-    @api.expect(TOKEN_FIELDS)
+    @user_ns.response(HTTPStatus.OK, 'Success')
+    @user_ns.response(HTTPStatus.NOT_FOUND, 'Not Found')
+    @user_ns.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
+    @user_ns.expect(TOKEN_FIELDS)
     def delete(self, username):
         """
         This method deletes a user from the database
@@ -195,14 +198,14 @@ class DeleteUser(Resource):
         return f"{username} deleted."
 
 
-@api.route('/users/<usern1>/req_friend/<usern2>')
+@user_ns.route('/<usern1>/req_friend/<usern2>')
 class RequestUser(Resource):
     """
     this class supports one user sending a friend request to another
     """
-    @api.response(HTTPStatus.OK, 'Success')
-    @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
-    @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
+    @user_ns.response(HTTPStatus.OK, 'Success')
+    @user_ns.response(HTTPStatus.NOT_FOUND, 'Not Found')
+    @user_ns.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
     def post(self, usern1, usern2):
         """
         This method adds two users to each others friend lists
@@ -229,14 +232,14 @@ class RequestUser(Resource):
                 a friend request"))
 
 
-@api.route('/users/<usern1>/dec_request/<usern2>')
+@user_ns.route('/<usern1>/dec_request/<usern2>')
 class DecRequest(Resource):
     """
     this class supports one user removing another from their friend requests
     """
-    @api.response(HTTPStatus.OK, 'Success')
-    @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
-    @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
+    @user_ns.response(HTTPStatus.OK, 'Success')
+    @user_ns.response(HTTPStatus.NOT_FOUND, 'Not Found')
+    @user_ns.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
     def post(self, usern1, usern2):
         """
         This method removes two users to each others request lists
@@ -257,15 +260,15 @@ class DecRequest(Resource):
                 a friend request"))
 
 
-@api.route('/users/<usern1>/add_friend/<usern2>')
+@user_ns.route('/<usern1>/add_friend/<usern2>')
 class BefriendUser(Resource):
     """
     This class supports two users adding each other as friends
     only if user2 has sent user1 a friend request
     """
-    @api.response(HTTPStatus.OK, 'Success')
-    @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
-    @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
+    @user_ns.response(HTTPStatus.OK, 'Success')
+    @user_ns.response(HTTPStatus.NOT_FOUND, 'Not Found')
+    @user_ns.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
     def post(self, usern1, usern2):
         """
         This method adds two users to each others friend lists
@@ -291,14 +294,14 @@ class BefriendUser(Resource):
             raise(wz.NotAcceptable("User cannot add themself as a friend"))
 
 
-@api.route('/users/<usern1>/remove_friend/<usern2>')
+@user_ns.route('/<usern1>/remove_friend/<usern2>')
 class UnfriendUser(Resource):
     """
     This class supports two users removing one another from their friends
     """
-    @api.response(HTTPStatus.OK, 'Success')
-    @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
-    @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
+    @user_ns.response(HTTPStatus.OK, 'Success')
+    @user_ns.response(HTTPStatus.NOT_FOUND, 'Not Found')
+    @user_ns.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
     def post(self, usern1, usern2):
         """
         This method removes two users from each others friend lists
@@ -313,14 +316,14 @@ class UnfriendUser(Resource):
             raise(wz.NotAcceptable("Users are not friends"))
 
 
-@api.route('/users/<username>/like_playlist/<playlist_name>')
+@user_ns.route('/<username>/like_playlist/<playlist_name>')
 class LikePlaylist(Resource):
     """
     This class supports a user liking a playlist
     """
-    @api.response(HTTPStatus.OK, 'Success')
-    @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
-    @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
+    @user_ns.response(HTTPStatus.OK, 'Success')
+    @user_ns.response(HTTPStatus.NOT_FOUND, 'Not Found')
+    @user_ns.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
     def post(self, username, playlist_name):
         """
         This method supports a user liking a playlist
@@ -340,14 +343,14 @@ class LikePlaylist(Resource):
             return f"{username} added {playlist_name} to their playlists"
 
 
-@api.route('/users/<username>/unlike_playlist/<playlist_name>')
+@user_ns.route('/<username>/unlike_playlist/<playlist_name>')
 class UnlikePlaylist(Resource):
     """
     This class supports a user unliking a playlist
     """
-    @api.response(HTTPStatus.OK, 'Success')
-    @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
-    @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
+    @user_ns.response(HTTPStatus.OK, 'Success')
+    @user_ns.response(HTTPStatus.NOT_FOUND, 'Not Found')
+    @user_ns.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
     def post(self, username, playlist_name):
         """
         This method supports a user unliking a playlist
@@ -366,12 +369,12 @@ class UnlikePlaylist(Resource):
             return f"{username} removed {playlist_name} from their playlists"
 
 
-@api.route('/users/get_friends/<username>')
+@user_ns.route('/get_friends/<username>')
 class GetFriends(Resource):
     """
     This class supports listing all of a user's friends
     """
-    @api.response(HTTPStatus.NOT_FOUND, 'User not found')
+    @user_ns.response(HTTPStatus.NOT_FOUND, 'User not found')
     def get(self, username):
         user = dbu.get_user(username)
         if user == dbu.NOT_FOUND:
@@ -380,12 +383,12 @@ class GetFriends(Resource):
             return dbu.get_friends(username)
 
 
-@api.route('/users/get_owned_playlists/<username>')
+@user_ns.route('/get_owned_playlists/<username>')
 class GetOwnedPlaylists(Resource):
     """
     This class supports listing all playlists a user has created
     """
-    @api.response(HTTPStatus.NOT_FOUND, 'User not found')
+    @user_ns.response(HTTPStatus.NOT_FOUND, 'User not found')
     def get(self, username):
         user = dbu.get_user(username)
         if user == dbu.NOT_FOUND:
@@ -394,12 +397,12 @@ class GetOwnedPlaylists(Resource):
             return dbu.get_created_playlists(username)
 
 
-@api.route('/users/get_likes/<username>')
+@user_ns.route('/get_likes/<username>')
 class GetLikedPlaylists(Resource):
     """
     This class supports listing all of a user's liked playlists
     """
-    @api.response(HTTPStatus.NOT_FOUND, 'User not found')
+    @user_ns.response(HTTPStatus.NOT_FOUND, 'User not found')
     def get(self, username):
         user = dbu.get_user(username)
         if user == dbu.NOT_FOUND:
@@ -411,13 +414,13 @@ class GetLikedPlaylists(Resource):
 # PLAYLIST METHODS
 
 
-@api.route('/playlists/list')
+@playlist_ns.route('/list')
 class ListPlaylists(Resource):
     """
     THis endpoints returns a list of all the playlists
     """
-    @api.response(HTTPStatus.OK, 'Success')
-    @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
+    @playlist_ns.response(HTTPStatus.OK, 'Success')
+    @playlist_ns.response(HTTPStatus.NOT_FOUND, 'Not Found')
     def get(self):
         """
         Returns a list of all the playlists
@@ -429,15 +432,15 @@ class ListPlaylists(Resource):
             return playlists
 
 
-@api.route('/playlists/create/<user_name>/<playlist_name>')
+@playlist_ns.route('/create/<user_name>/<playlist_name>')
 class CreatePlaylist(Resource):
     """
     This class supports adding a playlist to the database.
     """
-    @api.response(HTTPStatus.OK, 'Success')
-    @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
-    @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
-    @api.expect(TOKEN_FIELDS)
+    @playlist_ns.response(HTTPStatus.OK, 'Success')
+    @playlist_ns.response(HTTPStatus.NOT_FOUND, 'Not Found')
+    @playlist_ns.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
+    @playlist_ns.expect(TOKEN_FIELDS)
     def post(self, user_name, playlist_name):
         """
         This method adds a playlist to the database
@@ -452,14 +455,14 @@ class CreatePlaylist(Resource):
         return f"{user_name} created {playlist_name}."
 
 
-@api.route('/playlists/search/<playlist_name>')
+@playlist_ns.route('/search/<playlist_name>')
 class SearchPlaylist(Resource):
     """
     This class supports finding a playlist given its name
     """
-    @api.response(HTTPStatus.OK, 'Success')
-    @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
-    @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
+    @playlist_ns.response(HTTPStatus.OK, 'Success')
+    @playlist_ns.response(HTTPStatus.NOT_FOUND, 'Not Found')
+    @playlist_ns.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
     def get(self, playlist_name):
         """
         This method searches for a playlist in the database
@@ -471,14 +474,14 @@ class SearchPlaylist(Resource):
         return ret
 
 
-@api.route('/playlists/delete/<playlist_name>')
+@playlist_ns.route('/delete/<playlist_name>')
 class DeletePlaylist(Resource):
     """
     This class supports deleting a playlist from the database.
     """
-    @api.response(HTTPStatus.OK, 'Success')
-    @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
-    @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
+    @playlist_ns.response(HTTPStatus.OK, 'Success')
+    @playlist_ns.response(HTTPStatus.NOT_FOUND, 'Not Found')
+    @playlist_ns.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
     def delete(self, playlist_name):
         """
         This method deletes a playlist from the database
@@ -494,14 +497,14 @@ class DeletePlaylist(Resource):
             return f"{playlist_name} deleted."
 
 
-@api.route('/playlists/<pl_name>/add_song/<song_name>')
+@playlist_ns.route('/<pl_name>/add_song/<song_name>')
 class AddToPlaylist(Resource):
     """
     This class supports adding a song to a playlist in the database.
     """
-    @api.response(HTTPStatus.OK, 'Success')
-    @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
-    @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
+    @playlist_ns.response(HTTPStatus.OK, 'Success')
+    @playlist_ns.response(HTTPStatus.NOT_FOUND, 'Not Found')
+    @playlist_ns.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
     def post(self, pl_name, song_name):
         """
         This method adds a song to a playlist in the database
@@ -517,14 +520,14 @@ class AddToPlaylist(Resource):
                 return f"{song_name} added to {pl_name}."
 
 
-@api.route('/playlists/<pl_name>/remove_song/<song_name>')
+@playlist_ns.route('/<pl_name>/remove_song/<song_name>')
 class RemoveFromPlaylist(Resource):
     """
     This class supports removing a song from a playlist in the database.
     """
-    @api.response(HTTPStatus.OK, 'Success')
-    @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
-    @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
+    @playlist_ns.response(HTTPStatus.OK, 'Success')
+    @playlist_ns.response(HTTPStatus.NOT_FOUND, 'Not Found')
+    @playlist_ns.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
     def post(self, pl_name, song_name):
         """
         This method removes a song from a playlist in the database
