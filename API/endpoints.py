@@ -377,6 +377,9 @@ class GetFriends(Resource):
     """
     @user_ns.response(HTTPStatus.NOT_FOUND, 'User not found')
     def get(self, username):
+        """
+        This method supports listing all of a user's friends
+        """
         user = dbu.get_user(username)
         if user == dbu.NOT_FOUND:
             raise(wz.NotFound(f"User {username} not found"))
@@ -391,6 +394,9 @@ class GetOwnedPlaylists(Resource):
     """
     @user_ns.response(HTTPStatus.NOT_FOUND, 'User not found')
     def get(self, username):
+        """
+        This method supports listing all the playlists a user created
+        """
         user = dbu.get_user(username)
         if user == dbu.NOT_FOUND:
             raise(wz.NotFound(f"User {username} not found"))
@@ -405,6 +411,9 @@ class GetLikedPlaylists(Resource):
     """
     @user_ns.response(HTTPStatus.NOT_FOUND, 'User not found')
     def get(self, username):
+        """
+        This method supports listing all of a user's liked playlists
+        """
         user = dbu.get_user(username)
         if user == dbu.NOT_FOUND:
             raise(wz.NotFound(f"User {username} not found"))
