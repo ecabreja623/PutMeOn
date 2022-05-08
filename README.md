@@ -26,6 +26,8 @@ Frontend deployed to https://putmeon.netlify.app/
 - Use Github Actions (formerly Travis) as the CI/CD pipeline
 - Use Heroku to deploy the app
 
+## Capabilities
+
 - Users can create a user using the '/users/create' endpoint
     - users must pass a unique username 
 - Users can log in to receive an authentication token using the '/users/login' endpoint
