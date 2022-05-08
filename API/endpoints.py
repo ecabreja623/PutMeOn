@@ -14,6 +14,7 @@ import db.data_users as dbu
 app = Flask(__name__)
 api = Api(app)
 CORS(app)
+app.config['ERROR_404_HELP'] = False
 
 user_ns = api.namespace('users', description="User related endpoints")
 playlist_ns = api.namespace('playlists',
