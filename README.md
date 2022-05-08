@@ -18,16 +18,18 @@ Frontend deployed to https://putmeon.netlify.app/
 ## Design
 
 - Use flask_restx to build an API server
-- Multiple clients possible -- TBD
+- Multiple clients possible
 - Handle each major requirement with an API endpoint
 - Use Test-Driven-Development (TDD) to make sure we have testing
 - Use Swagger for initial interaction with server
 - Use Swagger, pydoc and good docstrings for documentation
-- Use Travis as the CI/CD pipeline
+- Use Github Actions (formerly Travis) as the CI/CD pipeline
 - Use Heroku to deploy the app
 
 - Users can create a user using the '/users/create' endpoint
     - users must pass a unique username 
+- Users can log in to receive an authentication token using the '/users/login' endpoint
+    - valid token is required for major edits
 - Users can delete a user using the '/users/delete' endpoint
 - Users can create playlists using the '/playlists/create' 
     - users must pass unique playlist name 
