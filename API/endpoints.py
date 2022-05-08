@@ -555,7 +555,7 @@ class RemoveFromPlaylist(Resource):
     @playlist_ns.response(HTTPStatus.OK, 'Success')
     @playlist_ns.response(HTTPStatus.NOT_FOUND, 'Not Found')
     @playlist_ns.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
-    def delete(self, pl_name, song_name):
+    def patch(self, pl_name, song_name):
         """
         This method removes a song from a playlist in the database
         """
