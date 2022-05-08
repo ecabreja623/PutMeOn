@@ -186,7 +186,7 @@ class DeleteUser(Resource):
     @user_ns.response(HTTPStatus.NOT_FOUND, 'Not Found')
     @user_ns.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
     @user_ns.expect(TOKEN_FIELDS)
-    def delete(self, username):
+    def patch(self, username):
         """
         This method deletes a user from the database
         """

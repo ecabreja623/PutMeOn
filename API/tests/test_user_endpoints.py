@@ -122,7 +122,7 @@ class EndpointTestCase(TestCase):
         Post-condition 1: we can create and delete a user
         """
         body = login()
-        TEST_CLIENT.delete(f'/users/delete/{body[dbu.USERNAME]}', json=body)
+        TEST_CLIENT.patch(f'/users/delete/{body[dbu.USERNAME]}', json=body)
         self.assertNotIn(body[dbu.USERNAME], dbu.get_users_dict())
 
     def test_delete_user2(self):
@@ -131,7 +131,7 @@ class EndpointTestCase(TestCase):
         """
         body = login()
         other = login()
-        TEST_CLIENT.delete(f'/users/delete/{other[dbu.USERNAME]}', json=body)
+        TEST_CLIENT.patch(f'/users/delete/{other[dbu.USERNAME]}', json=body)
         self.assertIn(other[dbu.USERNAME], dbu.get_users_dict())
 
     def test_delete_user3(self):
@@ -143,7 +143,7 @@ class EndpointTestCase(TestCase):
         TEST_CLIENT.post(f'/users/{body1[dbu.USERNAME]}/req_friend/{body2[dbu.USERNAME]}')
         TEST_CLIENT.post(f'/users/{body2[dbu.USERNAME]}/add_friend/{body1[dbu.USERNAME]}')
         TEST_CLIENT.post(f'/playlist/create/{body1[dbu.USERNAME]}/{FAKE_PLAYLIST}', json=body1)
-        TEST_CLIENT.delete(f'/users/delete/{body1[dbu.USERNAME]}', json=body1)
+        TEST_CLIENT.patch(f'/users/delete/{body1[dbu.USERNAME]}', json=body1)
         self.assertNotIn(body1[dbu.USERNAME], dbu.get_users_dict())
         self.assertNotIn(FAKE_PLAYLIST, dbp.get_playlists_dict())
         self.assertNotIn(body1[dbu.USERNAME], dbu.get_user(body2[dbu.USERNAME])['friends'])
