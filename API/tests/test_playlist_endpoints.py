@@ -172,7 +172,7 @@ class EndpointTestCase(TestCase):
         dbp.add_song(newpl, newsong)
         pl = dbp.get_playlist(newpl)
         self.assertIn(newsong, pl['songs'])
-        TEST_CLIENT.delete(f"/playlists/{newpl}/remove_song/{newsong}", json=body)
+        TEST_CLIENT.patch(f"/playlists/{newpl}/remove_song/{newsong}", json=body)
         pl = dbp.get_playlist(newpl)
         self.assertNotIn(newsong, pl['songs'])
 
@@ -184,7 +184,7 @@ class EndpointTestCase(TestCase):
         newpl = new_entity_name("playlist")
         dbp.add_playlist(newpl, body[dbu.USERNAME])
         newsong = new_entity_name("song")
-        resp =TEST_CLIENT.delete(f"/playlists/{newpl}/remove_song/{newsong}", json=body)
+        resp =TEST_CLIENT.patch(f"/playlists/{newpl}/remove_song/{newsong}", json=body)
         self.assertEqual(resp.json['message'], "song not in playlist")
 
     def test_remove_song3(self):
@@ -194,5 +194,5 @@ class EndpointTestCase(TestCase):
         newpl = new_entity_name("playlist")
         newsong = new_entity_name("song")
         body = login()
-        resp =TEST_CLIENT.delete(f"/playlists/{newpl}/remove_song/{newsong}", json=body)
+        resp =TEST_CLIENT.patch(f"/playlists/{newpl}/remove_song/{newsong}", json=body)
         self.assertEqual(resp.json['message'], "Playlist not found.")
